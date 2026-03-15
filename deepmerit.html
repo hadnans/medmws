@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MERIT Toolbox — Deep Technical Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  /* ── Root Variables ─────────────────────────────────────── */
+  :root {
+    --navy:    #0d1b2a;
+    --navy2:   #162032;
+    --navy3:   #1e2f45;
+    --navy4:   #2a3f58;
+    --gold:    #c9a84c;
+    --gold2:   #e0bc6e;
+    --gold3:   #f5d78e;
+    --cream:   #f7f3eb;
+    --cream2:  #ede8dc;
+    --text:    #1a1a2e;
+    --muted:   #4a5568;
+    --accent:  #3a7bd5;
+    --accent2: #5b9bd5;
+    --green:   #2a7f5f;
+    --red:     #8b2335;
+    --sidebar: 280px;
+    --r: 8px;
+    --r2: 4px;
+  }
+
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--cream);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    line-height: 1.75;
+  }
+
+  /* ── Sidebar Navigation ───────────────────────────────── */
+  #sidebar {
+    width: var(--sidebar);
+    min-height: 100vh;
+    background: var(--navy);
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: auto;
+    z-index: 100;
+    padding-bottom: 40px;
+    border-right: 2px solid var(--gold);
+  }
+  #sidebar-header {
+    background: linear-gradient(160deg, var(--navy3), var(--navy));
+    padding: 28px 20px 22px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+  }
+  #sidebar-header .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 2px;
+    display: block;
+  }
+  #sidebar-header .logo-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem;
+    color: rgba(201,168,76,0.65);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+  .nav-section {
+    margin-top: 18px;
+    padding: 0 12px;
+  }
+  .nav-section-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.5);
+    padding: 0 8px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 4px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: var(--r2);
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(247,243,235,0.72);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .nav-link:hover, .nav-link.active {
+    background: rgba(201,168,76,0.12);
+    color: var(--gold2);
+  }
+  .nav-link .nav-icon { font-size: 0.75rem; opacity: 0.7; width: 14px; }
+  .nav-link.sub { padding-left: 24px; font-size: 0.74rem; }
+
+  /* ── Main Content ─────────────────────────────────────── */
+  #main {
+    margin-left: var(--sidebar);
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  /* ── Top Banner ───────────────────────────────────────── */
+  #topbanner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 50%, #1a2a3d 100%);
+    padding: 60px 60px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  #topbanner::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  #topbanner::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .banner-tag {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    background: rgba(201,168,76,0.15);
+    color: var(--gold2);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .banner-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .banner-title span { color: var(--gold); }
+  .banner-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: rgba(247,243,235,0.55);
+    font-weight: 300;
+    margin-bottom: 28px;
+    max-width: 600px;
+  }
+  .banner-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: rgba(247,243,235,0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-pill::before { content: '◆'; color: var(--gold); font-size: 0.5rem; }
+
+  /* ── Content Wrapper ──────────────────────────────────── */
+  .content-wrap {
+    padding: 52px 60px;
+    max-width: 1000px;
+  }
+
+  /* ── Section Headings ─────────────────────────────────── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+  .section-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,168,76,0.4), transparent);
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-top: 36px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h3::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: var(--gold);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--navy);
+    margin-top: 22px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p {
+    margin-bottom: 14px;
+    color: #2d3748;
+    font-size: 0.97rem;
+  }
+  strong { color: var(--navy); font-weight: 600; }
+  em { font-style: italic; color: var(--navy3); }
+
+  /* ── Code Blocks ──────────────────────────────────────── */
+  pre {
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    overflow-x: auto;
+    margin: 18px 0;
+    position: relative;
+  }
+  pre .code-label {
+    position: absolute;
+    top: 8px; right: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.5);
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--cream);
+  }
+  p code, li code {
+    background: rgba(13,27,42,0.08);
+    border: 1px solid rgba(13,27,42,0.12);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.82em;
+    color: var(--navy);
+  }
+  /* Syntax highlighting */
+  .kw  { color: #c792ea; }   /* keywords */
+  .fn  { color: #82aaff; }   /* functions */
+  .str { color: #c3e88d; }   /* strings */
+  .cm  { color: #546e7a; font-style: italic; } /* comments */
+  .num { color: #f78c6c; }   /* numbers */
+  .var { color: #eeffff; }   /* variables */
+  .op  { color: var(--gold2); } /* operators/punctuation */
+  .ann { color: #89ddff; }   /* annotations/field names */
+
+  /* ── Callout Boxes ────────────────────────────────────── */
+  .callout {
+    border-radius: var(--r);
+    padding: 18px 22px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; }
+  .callout-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout p { margin-bottom: 0; font-size: 0.9rem; }
+  .callout.tip    { background: rgba(42,127,95,0.08);  border: 1px solid rgba(42,127,95,0.25); }
+  .callout.tip    .callout-title { color: var(--green); }
+  .callout.warn   { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3); }
+  .callout.warn   .callout-title { color: #9a7a30; }
+  .callout.info   { background: rgba(58,123,213,0.08); border: 1px solid rgba(58,123,213,0.25); }
+  .callout.info   .callout-title { color: var(--accent); }
+  .callout.danger { background: rgba(139,35,53,0.08);  border: 1px solid rgba(139,35,53,0.25); }
+  .callout.danger .callout-title { color: var(--red); }
+
+  /* ── Tables ───────────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; margin: 20px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem;
+  }
+  thead { background: var(--navy); color: var(--cream); }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child  { border-radius: 0 6px 0 0; }
+  tbody tr { border-bottom: 1px solid rgba(0,0,0,0.06); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(201,168,76,0.05); }
+  tbody td { padding: 10px 16px; vertical-align: top; color: #2d3748; }
+  tbody td:first-child { font-weight: 500; color: var(--navy); }
+  .tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .tag.td  { background: rgba(58,123,213,0.12); color: var(--accent); border: 1px solid rgba(58,123,213,0.2); }
+  .tag.fd  { background: rgba(42,127,95,0.12);  color: var(--green);  border: 1px solid rgba(42,127,95,0.2); }
+  .tag.util{ background: rgba(201,168,76,0.12); color: #7a6020;       border: 1px solid rgba(201,168,76,0.25); }
+  .tag.core{ background: rgba(139,35,53,0.1);   color: var(--red);    border: 1px solid rgba(139,35,53,0.2); }
+
+  /* ── Pipeline Diagram ─────────────────────────────────── */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .pipe-step {
+    flex: 1;
+    min-width: 120px;
+    background: var(--navy3);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-right: none;
+    padding: 14px 12px;
+    position: relative;
+    text-align: center;
+  }
+  .pipe-step:last-child { border-right: 1px solid rgba(201,168,76,0.2); }
+  .pipe-step:first-child { border-radius: 6px 0 0 6px; }
+  .pipe-step:last-child  { border-radius: 0 6px 6px 0; }
+  .pipe-step::after {
+    content: '▶';
+    position: absolute;
+    right: -11px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 0.7rem;
+    z-index: 1;
+  }
+  .pipe-step:last-child::after { display: none; }
+  .pipe-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .pipe-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--cream2);
+    margin-top: 4px;
+  }
+  .pipe-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.6rem;
+    color: rgba(247,243,235,0.4);
+    margin-top: 3px;
+  }
+
+  /* ── Struct Tree ──────────────────────────────────────── */
+  .struct-tree {
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--cream);
+    margin: 18px 0;
+    overflow-x: auto;
+  }
+  .st-field  { color: #82aaff; }
+  .st-type   { color: #c3e88d; }
+  .st-dim    { color: #f78c6c; }
+  .st-desc   { color: #546e7a; font-style: italic; }
+  .st-root   { color: var(--gold2); font-weight: 600; }
+  .st-indent { padding-left: 20px; }
+  .st-indent2{ padding-left: 40px; }
+
+  /* ── File Cards ───────────────────────────────────────── */
+  .file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .file-card {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--r);
+    padding: 18px 20px;
+    border-top: 3px solid var(--gold);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .file-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-2px); }
+  .file-card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .file-card-pkg {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .file-card-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Accordion / Expandable ───────────────────────────── */
+  details {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--r);
+    margin: 12px 0;
+    overflow: hidden;
+  }
+  summary {
+    background: white;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: '▶';
+    font-size: 0.6rem;
+    color: var(--gold);
+    transition: transform 0.2s;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  details[open] summary { background: rgba(201,168,76,0.06); }
+  .details-body { padding: 18px 22px; border-top: 1px solid rgba(0,0,0,0.08); }
+
+  /* ── Math Display ─────────────────────────────────────── */
+  .math-block {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border-left: 4px solid var(--accent2);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    margin: 18px 0;
+    text-align: center;
+  }
+  .math-eq {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--cream);
+    letter-spacing: 0.5px;
+  }
+  .math-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(247,243,235,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 8px;
+  }
+
+  /* ── Contribution Guide Cards ─────────────────────────── */
+  .contrib-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 22px;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--r);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .contrib-step::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--gold);
+  }
+  .contrib-num {
+    width: 36px; height: 36px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .contrib-body h4 { margin-top: 0; font-size: 0.9rem; }
+  .contrib-body p  { font-size: 0.87rem; margin-bottom: 0; }
+
+  /* ── Divider ──────────────────────────────────────────── */
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin: 48px 0;
+  }
+  .gold-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── Summary Boxes ────────────────────────────────────── */
+  .summary-box {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+    border-radius: var(--r);
+    padding: 28px 30px;
+    margin: 28px 0;
+    border: 1px solid rgba(201,168,76,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-box::before {
+    content: '✦';
+    position: absolute;
+    top: 16px; right: 20px;
+    font-size: 2rem;
+    color: rgba(201,168,76,0.1);
+  }
+  .summary-box h3 {
+    color: var(--gold);
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+  .summary-box h3::before { background: var(--gold2); }
+  .summary-box p, .summary-box li { color: rgba(247,243,235,0.8); font-size: 0.88rem; }
+  .summary-box ul { padding-left: 18px; }
+  .summary-box li { margin-bottom: 6px; }
+  .summary-box code { background: rgba(255,255,255,0.1); color: var(--gold3); border: none; }
+
+  /* ── Inline Hint ──────────────────────────────────────── */
+  .hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    color: var(--green);
+    background: rgba(42,127,95,0.08);
+    border: 1px solid rgba(42,127,95,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin: 2px 0;
+  }
+
+  /* ── ToC scroll indicator ─────────────────────────────── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent2));
+    width: 0%;
+    z-index: 200;
+    transition: width 0.1s;
+  }
+
+  /* ── Responsive ───────────────────────────────────────── */
+  @media (max-width: 900px) {
+    #sidebar { display: none; }
+    #main { margin-left: 0; }
+    .content-wrap { padding: 32px 24px; }
+    #topbanner { padding: 40px 24px; }
+    .banner-title { font-size: 2.2rem; }
+    .pipeline { flex-direction: column; }
+    .pipe-step { border-right: 1px solid rgba(201,168,76,0.2); border-bottom: none; }
+    .pipe-step:last-child { border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .pipe-step::after { content: '▼'; right: 50%; top: auto; bottom: -12px; transform: translateX(50%); }
+  }
+
+  /* ── Lists ────────────────────────────────────────────── */
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  li { margin-bottom: 5px; color: #2d3748; font-size: 0.97rem; }
+
+  /* ── Footer ───────────────────────────────────────────── */
+  #footer {
+    background: var(--navy);
+    color: rgba(247,243,235,0.45);
+    text-align: center;
+    padding: 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <span class="logo-text">MERIT</span>
+    <span class="logo-sub">Microwave Radar Imaging Toolbox</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Overview</div>
+    <a class="nav-link" href="#s1">◈ Introduction &amp; Purpose</a>
+    <a class="nav-link" href="#s2">◈ Repository Architecture</a>
+    <a class="nav-link" href="#s3">◈ MATLAB Package System</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Data Structures</div>
+    <a class="nav-link" href="#s4">◈ Channel Data Struct</a>
+    <a class="nav-link" href="#s5">◈ Imaging Domain</a>
+    <a class="nav-link" href="#s6">◈ Scan Object</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Core Pipeline</div>
+    <a class="nav-link" href="#s7">◈ merit() Entry Function</a>
+    <a class="nav-link" href="#s8">◈ Signal Processing Chain</a>
+    <a class="nav-link sub" href="#s8a"> ⌙ Calibration</a>
+    <a class="nav-link sub" href="#s8b"> ⌙ Filtering</a>
+    <a class="nav-link sub" href="#s8c"> ⌙ Time Windowing</a>
+    <a class="nav-link" href="#s9">◈ Delay Calculation</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Algorithms</div>
+    <a class="nav-link" href="#s10">◈ DAS — Delay-and-Sum</a>
+    <a class="nav-link" href="#s11">◈ DMAS — Delay-Multiply-Sum</a>
+    <a class="nav-link" href="#s12">◈ Frequency-Domain DAS</a>
+    <a class="nav-link" href="#s13">◈ Algorithm Dispatcher</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Metrics &amp; Output</div>
+    <a class="nav-link" href="#s14">◈ Image Quality Metrics</a>
+    <a class="nav-link" href="#s15">◈ Visualization Utilities</a>
+    <a class="nav-link" href="#s16">◈ I/O Functions</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Extension</div>
+    <a class="nav-link" href="#s17">◈ Adding New Algorithms</a>
+    <a class="nav-link" href="#s18">◈ Adding New Metrics</a>
+    <a class="nav-link" href="#s19">◈ Adding Preprocessing</a>
+    <a class="nav-link" href="#s20">◈ Tips &amp; Best Practices</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div id="main">
+
+<!-- ── Top Banner ── -->
+<div id="topbanner">
+  <div class="banner-tag">Deep Technical Reference</div>
+  <div class="banner-title"><span>MERIT</span> Toolbox</div>
+  <div class="banner-subtitle">Microwave Emerging and Radar-based Imaging Toolbox — Complete Internals Guide for Biomedical Imaging Researchers</div>
+  <div class="banner-meta">
+    <span class="meta-pill">MATLAB Package Architecture</span>
+    <span class="meta-pill">Radar-Based Breast Imaging</span>
+    <span class="meta-pill">UCD / Open Source</span>
+    <span class="meta-pill">DAS · DMAS · FD-DAS Algorithms</span>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — Introduction -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s1">
+  <div class="section-label">Section 01</div>
+  <h2>Introduction &amp; Purpose</h2>
+
+  <p>
+    <strong>MERIT</strong> (Microwave Emerging and Radar-based Imaging Toolbox) is an open-source MATLAB toolbox developed primarily at <strong>University College Dublin (UCD)</strong> by the research group of Prof. Martin O'Halloran, Dr. Emily Porter, and collaborators. Its fundamental goal is to provide a modular, reproducible, and extendable platform for <strong>microwave radar breast imaging</strong> — an active area of research targeting non-ionizing, non-contact tumor detection as an alternative or complement to X-ray mammography.
+  </p>
+
+  <p>
+    The toolbox abstracts the full imaging pipeline: from loading raw antenna S-parameter measurements, through calibration and signal conditioning, to 3-D image reconstruction via beamforming algorithms and final image quality evaluation. Because everything is encapsulated inside a <strong>MATLAB package namespace</strong> (<code>+merit</code>), it integrates cleanly into any existing codebase without polluting the global function space.
+  </p>
+
+  <h3>Why MERIT Was Built</h3>
+  <p>
+    Prior to MERIT, researchers had to re-implement beamformers from scratch for each study, making results difficult to compare across groups. MERIT solves this by providing:
+  </p>
+  <ul>
+    <li><strong>Algorithm parity</strong> — identical implementations of DAS, DMAS, and FD-DAS across all experiments.</li>
+    <li><strong>Standardized data structures</strong> — the <code>channels</code> struct and <code>points</code> array are universal across all functions.</li>
+    <li><strong>Plug-in extensibility</strong> — new algorithms, metrics, and preprocessing functions are added with minimal boilerplate.</li>
+    <li><strong>Reproducibility</strong> — the toolbox is versioned and published, enabling citation and comparison.</li>
+  </ul>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ</div>
+    <div class="callout-body">
+      <div class="callout-title">Research Context</div>
+      <p>MERIT is specifically designed for <em>confocal microwave imaging (CMI)</em> where an antenna array illuminates a breast phantom or tissue, and backscattered signals are processed to localize dielectric anomalies (tumors). The toolbox is not limited to breast imaging — any near-field radar scenario with multi-static or mono-static array data can use it.</p>
+    </div>
+  </div>
+
+  <h3>Installation</h3>
+  <pre><code><span class="cm">% 1. Clone or download the repository</span>
+<span class="fn">git clone</span> <span class="str">https://github.com/EMFoDI/merit.git</span>
+
+<span class="cm">% 2. In MATLAB, add the toolbox root to the path</span>
+<span class="fn">addpath</span>(<span class="str">'/path/to/merit'</span>);
+
+<span class="cm">% 3. Verify installation by running the demo</span>
+<span class="fn">run</span>(<span class="str">'merit/demos/demo_breast.m'</span>);
+
+<span class="cm">% 4. (Optional) Save path permanently</span>
+<span class="fn">savepath</span>();
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">Path Warning</div>
+      <p>Only add the <em>root</em> directory (the one containing <code>merit.m</code> and the <code>+merit</code> folder). Do <strong>not</strong> add sub-folders individually — MATLAB's package system requires the parent folder of <code>+merit</code> to be on the path, not the package folder itself.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — Repository Architecture -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-label">Section 02</div>
+  <h2>Repository Architecture</h2>
+
+  <p>
+    The repository follows a clean, namespace-based layout. Every functional module lives inside <code>+merit/</code> sub-packages, making it impossible to accidentally call a MERIT function without explicit namespacing. This is <strong>by design</strong>.
+  </p>
+
+  <div class="struct-tree">
+<span class="st-root">merit/</span>                          <span class="st-desc">← root: add this to MATLAB path</span>
+│
+├── <span class="st-field">merit.m</span>                     <span class="st-desc">← THE main entry point function</span>
+├── <span class="st-field">README.md</span>
+├── <span class="st-field">LICENSE</span>
+│
+├── <span class="st-root">+merit/</span>                     <span class="st-desc">← MATLAB package namespace</span>
+│   │
+│   ├── <span class="st-root">+algorithms/</span>            <span class="st-desc">← imaging reconstruction algorithms</span>
+│   │   ├── <span class="st-field">das.m</span>               <span class="st-desc">← Delay-and-Sum (time domain)</span>
+│   │   ├── <span class="st-field">dmas.m</span>              <span class="st-desc">← Delay-Multiply-and-Sum</span>
+│   │   ├── <span class="st-field">fd_das.m</span>            <span class="st-desc">← Frequency-Domain DAS</span>
+│   │   └── <span class="st-field">get_algorithm.m</span>     <span class="st-desc">← dispatcher: string → function handle</span>
+│   │
+│   ├── <span class="st-root">+beamform/</span>              <span class="st-desc">← beamforming sub-routines</span>
+│   │   ├── <span class="st-field">delay.m</span>             <span class="st-desc">← round-trip propagation delay calc</span>
+│   │   └── <span class="st-field">apodization.m</span>       <span class="st-desc">← spatial weighting (Hann, uniform...)</span>
+│   │
+│   ├── <span class="st-root">+domain/</span>                <span class="st-desc">← 3-D imaging grid construction</span>
+│   │   ├── <span class="st-field">get_domain.m</span>        <span class="st-desc">← build voxel grid from axis ranges</span>
+│   │   └── <span class="st-field">get_points.m</span>        <span class="st-desc">← alternative: discrete point cloud</span>
+│   │
+│   ├── <span class="st-root">+io/</span>                    <span class="st-desc">← data input / output helpers</span>
+│   │   ├── <span class="st-field">read_data.m</span>         <span class="st-desc">← load raw scan .mat or .csv files</span>
+│   │   └── <span class="st-field">write_data.m</span>        <span class="st-desc">← save image volumes</span>
+│   │
+│   ├── <span class="st-root">+metrics/</span>               <span class="st-desc">← image quality evaluation</span>
+│   │   ├── <span class="st-field">scr.m</span>               <span class="st-desc">← Signal-to-Clutter Ratio</span>
+│   │   ├── <span class="st-field">smr.m</span>               <span class="st-desc">← Signal-to-Mean Ratio</span>
+│   │   └── <span class="st-field">loc.m</span>               <span class="st-desc">← Localization Error (mm)</span>
+│   │
+│   ├── <span class="st-root">+process/</span>               <span class="st-desc">← signal preprocessing</span>
+│   │   ├── <span class="st-field">filter.m</span>            <span class="st-desc">← bandpass / Butterworth filter</span>
+│   │   ├── <span class="st-field">time_window.m</span>       <span class="st-desc">← Hann or rectangular time gate</span>
+│   │   └── <span class="st-field">calibrate.m</span>         <span class="st-desc">← subtract reference (skin artifact)</span>
+│   │
+│   └── <span class="st-root">+scan/</span>                  <span class="st-desc">← scan metadata structures</span>
+│       ├── <span class="st-field">get_scan.m</span>          <span class="st-desc">← build scan struct from raw inputs</span>
+│       └── <span class="st-field">get_channel.m</span>       <span class="st-desc">← extract single tx-rx channel pair</span>
+│
+├── <span class="st-root">demos/</span>                      <span class="st-desc">← worked example scripts</span>
+│   ├── <span class="st-field">demo_breast.m</span>
+│   └── <span class="st-field">demo_synthetic.m</span>
+│
+└── <span class="st-root">data/</span>                       <span class="st-desc">← example phantom measurement data</span>
+    └── <span class="st-field">example_scan.mat</span>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Key Architectural Insight</div>
+      <p>There are <strong>two levels</strong> of entry into MERIT. The top-level <code>merit.m</code> is a convenience wrapper. The real work is done by <code>merit.algorithms.*</code>. You can bypass the wrapper entirely and call algorithms directly — useful for performance tuning and custom pipelines.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — MATLAB Package System -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-label">Section 03</div>
+  <h2>MATLAB Package System Explained</h2>
+
+  <p>
+    MERIT uses <strong>MATLAB package folders</strong> (directories prefixed with <code>+</code>). This is a namespacing mechanism similar to Python's module system. Understanding it is essential before modifying the toolbox.
+  </p>
+
+  <h3>How Packages Work</h3>
+  <p>Any folder named <code>+name</code> becomes the namespace <code>name</code>. Functions inside it are called as <code>name.function()</code>. Nested packages (e.g., <code>+merit/+algorithms/das.m</code>) are called as <code>merit.algorithms.das()</code>.</p>
+
+  <pre><code><span class="cm">% Calling a packaged function — three equivalent approaches:</span>
+
+<span class="cm">% 1. Full namespace (always works, most explicit)</span>
+img = <span class="fn">merit.algorithms.das</span>(channels, points, freq);
+
+<span class="cm">% 2. Import into local scope (convenient for scripts)</span>
+<span class="kw">import</span> merit.algorithms.*;
+img = <span class="fn">das</span>(channels, points, freq);
+
+<span class="cm">% 3. Store as function handle (useful for passing as parameter)</span>
+alg = <span class="op">@</span>merit.algorithms.das;
+img = <span class="fn">alg</span>(channels, points, freq);
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">Common Mistake</div>
+      <p>If you create a new file inside <code>+merit/+algorithms/</code> but MATLAB cannot find it, the most common cause is that the <em>parent of</em> <code>+merit</code> is not on the path. Run <code>which merit</code> to confirm — if it returns the path to <code>merit.m</code>, the root is on the path and your new function should be accessible as <code>merit.algorithms.yourfunction()</code>.</p>
+    </div>
+  </div>
+
+  <h3>Function Signatures in MERIT</h3>
+  <p>All algorithm functions in MERIT share a <strong>consistent signature contract</strong>. This is what allows the dispatcher (<code>get_algorithm.m</code>) to work generically:</p>
+
+  <pre><code><span class="cm">% Standard algorithm signature (must be followed by all algorithms)</span>
+<span class="kw">function</span> <span class="var">image</span> = <span class="fn">algorithm_name</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">settings</span>)
+<span class="cm">%
+% Inputs:
+%   channels  - struct with antenna positions and signal data
+%   points    - Px3 double array of imaging grid coordinates [m]
+%   settings  - struct with algorithm-specific parameters
+%
+% Output:
+%   image     - Px1 double, reconstructed power at each grid point
+%</span>
+<span class="code-label">MATLAB</span></code></pre>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 — Channel Data Struct -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-label">Section 04</div>
+  <h2>The <code>channels</code> Data Structure</h2>
+
+  <p>
+    The <code>channels</code> struct is the <strong>central data object</strong> in MERIT. Everything flows through it. Understanding every field is mandatory before building new functionality. It represents all measurement data collected from the antenna array.
+  </p>
+
+  <div class="struct-tree">
+<span class="st-root">channels</span>                        <span class="st-desc">← main measurement data struct</span>
+│
+├── <span class="st-field">.antennas</span>     <span class="st-type">[N × 3]</span>  <span class="st-dim">double</span>  <span class="st-desc">← (x,y,z) positions of all N antennas [meters]</span>
+│
+├── <span class="st-field">.time</span>         <span class="st-type">[1 × T]</span>  <span class="st-dim">double</span>  <span class="st-desc">← time vector [seconds]</span>
+│                                           <span class="st-desc">   Δt = 1/(2 × f_max) typical</span>
+│
+├── <span class="st-field">.freq</span>         <span class="st-type">[1 × F]</span>  <span class="st-dim">double</span>  <span class="st-desc">← frequency vector [Hz] (for FD algorithms)</span>
+│
+├── <span class="st-field">.data</span>         <span class="st-type">[N × N × T]</span> <span class="st-dim">double</span> <span class="st-desc">← calibrated time-domain signals</span>
+│                                           <span class="st-desc">   data(i,j,:) = signal from tx i → rx j</span>
+│                                           <span class="st-desc">   diagonal = monostatic (i==j)</span>
+│
+├── <span class="st-field">.fd_data</span>      <span class="st-type">[N × N × F]</span> <span class="st-dim">complex</span> <span class="st-desc">← freq-domain signals (if FD preprocessing done)</span>
+│
+├── <span class="st-field">.speed</span>        <span class="st-type">[scalar]</span>  <span class="st-dim">double</span>  <span class="st-desc">← effective propagation speed [m/s]</span>
+│                                           <span class="st-desc">   typically c/√ε_r for homogeneous medium</span>
+│                                           <span class="st-desc">   e.g. 0.7×c for breast phantom</span>
+│
+└── <span class="st-field">.mask</span>         <span class="st-type">[N × N]</span>  <span class="st-dim">logical</span> <span class="st-desc">← which tx-rx pairs to include</span>
+                                            <span class="st-desc">   true = use, false = skip</span>
+                                            <span class="st-desc">   often excludes adjacent pairs (near-field)</span>
+  </div>
+
+  <h3>Building a <code>channels</code> Struct from Scratch</h3>
+  <pre><code><span class="cm">%% Example: Build a channels struct for a 16-element circular array</span>
+N       = <span class="num">16</span>;
+r       = <span class="num">0.07</span>;                    <span class="cm">% array radius 7 cm</span>
+theta   = <span class="fn">linspace</span>(<span class="num">0</span>, <span class="num">2</span>*pi, N+<span class="num">1</span>); theta(<span class="kw">end</span>) = [];
+
+<span class="cm">% Antenna positions on a circle at z = 0</span>
+channels.<span class="ann">antennas</span> = [r*<span class="fn">cos</span>(theta)', r*<span class="fn">sin</span>(theta)', <span class="fn">zeros</span>(N,<span class="num">1</span>)];
+
+<span class="cm">% Time vector (2 ns window, sampled at 0.5 GHz bandwidth)</span>
+dt                = <span class="num">1e-12</span>;         <span class="cm">% 1 ps step</span>
+channels.<span class="ann">time</span>    = (<span class="num">0</span>:dt:<span class="num">2e-9</span>); <span class="cm">% 0 to 2 ns</span>
+
+<span class="cm">% Effective propagation speed (coupling medium ε_r ≈ 10)</span>
+channels.<span class="ann">speed</span>   = <span class="num">3e8</span> / <span class="fn">sqrt</span>(<span class="num">10</span>);
+
+<span class="cm">% Load S21 data — shape must be [N x N x length(time)]</span>
+channels.<span class="ann">data</span>    = raw_s21_data;   <span class="cm">% your measured/simulated data</span>
+
+<span class="cm">% Mask: use all pairs except self-coupling (diagonal)</span>
+channels.<span class="ann">mask</span>    = ~<span class="fn">eye</span>(N, N, <span class="str">'logical'</span>);
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Speed Parameter — The Most Critical Setting</div>
+      <p>The <code>channels.speed</code> value directly determines how time delays are translated into spatial distances. A 10% error in speed propagates as a ~10% positioning error in the reconstructed image. For a <strong>heterogeneous breast</strong>, use a frequency-averaged effective permittivity. For FDTD simulation data, use the exact permittivity of the coupling liquid.</p>
+    </div>
+  </div>
+
+  <h3>Multi-Static vs Mono-Static Configuration</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Mode</th><th>data indexing</th><th>mask setting</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Mono-static</td><td><code>data(i,i,:)</code> only</td><td>Only diagonal = true</td><td>Single antenna tx/rx — simpler, lower clutter</td></tr>
+      <tr><td>Multi-static (full)</td><td>All <code>data(i,j,:)</code></td><td>All pairs = true</td><td>Maximum data, best image quality</td></tr>
+      <tr><td>Multi-static (partial)</td><td>Selected pairs</td><td>Custom logical matrix</td><td>Exclude adjacent antennas for near-field</td></tr>
+      <tr><td>Bi-static (one tx)</td><td><code>data(1,j,:)</code> for all j</td><td>Row 1 only</td><td>Single illumination point</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 — Imaging Domain -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-label">Section 05</div>
+  <h2>The Imaging Domain (<code>points</code>)</h2>
+
+  <p>
+    The imaging domain is a 3-D voxel grid over which the beamformer evaluates its focusing function. Every voxel becomes one pixel in the final image. The domain is passed to all algorithms as a <strong>Px3 matrix</strong> — where P is the total number of grid points and each row is the [x, y, z] coordinate of one voxel in meters.
+  </p>
+
+  <h3>Creating a Domain with <code>merit.domain.get_domain</code></h3>
+  <pre><code><span class="cm">% Define 3-D imaging region: a 14×14×6 cm volume</span>
+x_range = [<span class="op">-</span><span class="num">0.07</span>, <span class="num">0.07</span>];   <span class="cm">% [m]</span>
+y_range = [<span class="op">-</span><span class="num">0.07</span>, <span class="num">0.07</span>];
+z_range = [<span class="num">0.00</span>, <span class="num">0.06</span>];
+res     = <span class="num">0.002</span>;             <span class="cm">% 2 mm resolution</span>
+
+points = <span class="fn">merit.domain.get_domain</span>(x_range, y_range, z_range, res);
+<span class="cm">% points is [P × 3] where P = 71×71×31 = 156,401 voxels</span>
+
+<span class="cm">% Internally, get_domain does:</span>
+<span class="cm">%   [X,Y,Z] = meshgrid(x_range(1):res:x_range(2), ...);</span>
+<span class="cm">%   points  = [X(:), Y(:), Z(:)];</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <h3>Reshaping the Output Back to 3-D</h3>
+  <p>After running the algorithm, you get a <strong>column vector</strong> <code>image</code> of length P. To visualize, you must reshape it back to the 3-D grid dimensions:</p>
+
+  <pre><code><span class="cm">% Run DAS algorithm → get flat Px1 image vector</span>
+img_flat = <span class="fn">merit.algorithms.das</span>(channels, points, settings);
+
+<span class="cm">% Compute grid dimensions from domain parameters</span>
+nx = <span class="fn">numel</span>(x_range(<span class="num">1</span>):res:x_range(<span class="num">2</span>));
+ny = <span class="fn">numel</span>(y_range(<span class="num">1</span>):res:y_range(<span class="num">2</span>));
+nz = <span class="fn">numel</span>(z_range(<span class="num">1</span>):res:z_range(<span class="num">2</span>));
+
+<span class="cm">% Reshape to [ny × nx × nz] (meshgrid ordering)</span>
+img_vol = <span class="fn">reshape</span>(img_flat, ny, nx, nz);
+
+<span class="cm">% Visualize a cross-sectional slice at z index 15</span>
+<span class="fn">imagesc</span>(x_range(<span class="num">1</span>):res:x_range(<span class="num">2</span>), ...
+        y_range(<span class="num">1</span>):res:y_range(<span class="num">2</span>), ...
+        img_vol(:,:,<span class="num">15</span>));
+<span class="fn">axis</span> equal tight; <span class="fn">colormap</span>(hot); <span class="fn">colorbar</span>;
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">meshgrid vs ndgrid Ordering</div>
+      <p><code>get_domain</code> uses <code>meshgrid</code> internally, which means the <em>first</em> dimension of the 3-D reshape corresponds to <strong>y</strong>, and the <em>second</em> to <strong>x</strong> — opposite to what you might expect. Always use the correct axis vectors when calling <code>imagesc</code> or the coordinate axes will be swapped.</p>
+    </div>
+  </div>
+
+  <h3>Resolution vs. Computation Time Trade-off</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Resolution</th><th>Points (14×14×6 cm)</th><th>DAS time (approx.)</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td>5 mm</td><td>~11,000</td><td>Seconds</td><td>Quick diagnostics</td></tr>
+      <tr><td>2 mm</td><td>~156,000</td><td>10–60 sec</td><td>Standard research</td></tr>
+      <tr><td>1 mm</td><td>~1,200,000</td><td>5–30 min</td><td>High-resolution study</td></tr>
+      <tr><td>0.5 mm</td><td>~9,700,000</td><td>Hours</td><td>Use GPU / parallelized</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 7 — merit() Entry Function -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-label">Section 07</div>
+  <h2>The <code>merit()</code> Entry Function — Deep Walkthrough</h2>
+
+  <p>
+    The file <code>merit.m</code> at the repository root is the <strong>primary convenience wrapper</strong>. It orchestrates the entire imaging pipeline in one call. Understanding exactly what it does internally is essential for debugging and customizing the pipeline.
+  </p>
+
+  <h3>Function Signature</h3>
+  <pre><code><span class="kw">function</span> <span class="var">image</span> = <span class="fn">merit</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">algorithm</span>, <span class="var">varargin</span>)
+<span class="cm">%MERIT  Reconstruct a microwave radar image.
+%
+%  IMAGE = MERIT(CHANNELS, POINTS, ALGORITHM)
+%  IMAGE = MERIT(CHANNELS, POINTS, ALGORITHM, 'param', value, ...)
+%
+%  Inputs:
+%    channels  - (struct) measurement data and antenna configuration
+%    points    - (P×3 double) imaging grid voxel coordinates [m]
+%    algorithm - (string or function handle) algorithm selector
+%                'das'    → merit.algorithms.das
+%                'dmas'   → merit.algorithms.dmas
+%                'fd_das' → merit.algorithms.fd_das
+%
+%  Name-Value Parameters (varargin):
+%    'Mask'         - (N×N logical) override channels.mask
+%    'Speed'        - (scalar) override channels.speed
+%    'Apodization'  - (string) 'hann'|'uniform'|'custom'
+%    'FreqRange'    - ([f_lo, f_hi]) bandpass filter limits [Hz]
+%    'Window'       - (2×1) time window [t_start, t_end] [s]
+%
+%  Output:
+%    image     - (P×1 double) reconstructed image intensities</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <h3>What <code>merit()</code> Does Internally — Step by Step</h3>
+  <div class="pipeline">
+    <div class="pipe-step"><div class="pipe-num">1</div><div class="pipe-name">Parse Inputs</div><div class="pipe-sub">inputParser<br>varargin</div></div>
+    <div class="pipe-step"><div class="pipe-num">2</div><div class="pipe-name">Get Algorithm</div><div class="pipe-sub">get_algorithm()<br>string → fhandle</div></div>
+    <div class="pipe-step"><div class="pipe-num">3</div><div class="pipe-name">Preprocess</div><div class="pipe-sub">filter<br>time_window</div></div>
+    <div class="pipe-step"><div class="pipe-num">4</div><div class="pipe-name">Compute Delays</div><div class="pipe-sub">beamform.delay()<br>for each voxel</div></div>
+    <div class="pipe-step"><div class="pipe-num">5</div><div class="pipe-name">Beamform</div><div class="pipe-sub">algorithm(channels<br>points, settings)</div></div>
+    <div class="pipe-step"><div class="pipe-num">6</div><div class="pipe-name">Return Image</div><div class="pipe-sub">P×1 double<br>intensity map</div></div>
+  </div>
+
+  <pre><code><span class="cm">%% Annotated internal logic of merit.m (simplified)</span>
+
+<span class="kw">function</span> <span class="var">image</span> = <span class="fn">merit</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">algorithm</span>, <span class="var">varargin</span>)
+
+  <span class="cm">% ── Step 1: Parse optional name-value arguments ──────────</span>
+  p = <span class="fn">inputParser</span>();
+  p.<span class="fn">addParameter</span>(<span class="str">'FreqRange'</span>,    [],      <span class="op">@</span>isnumeric);
+  p.<span class="fn">addParameter</span>(<span class="str">'Window'</span>,       [],      <span class="op">@</span>isnumeric);
+  p.<span class="fn">addParameter</span>(<span class="str">'Apodization'</span>,  <span class="str">'hann'</span>, <span class="op">@</span>ischar);
+  p.<span class="fn">addParameter</span>(<span class="str">'Speed'</span>,        [],      <span class="op">@</span>isscalar);
+  p.<span class="fn">parse</span>(varargin{:});
+  opts = p.<span class="ann">Results</span>;
+
+  <span class="cm">% ── Step 2: Resolve algorithm to function handle ─────────</span>
+  alg_fn = <span class="fn">merit.algorithms.get_algorithm</span>(algorithm);
+
+  <span class="cm">% ── Step 3: Apply preprocessing ──────────────────────────</span>
+  <span class="kw">if</span> ~<span class="fn">isempty</span>(opts.<span class="ann">FreqRange</span>)
+    channels = <span class="fn">merit.process.filter</span>(channels, opts.<span class="ann">FreqRange</span>);
+  <span class="kw">end</span>
+  <span class="kw">if</span> ~<span class="fn">isempty</span>(opts.<span class="ann">Window</span>)
+    channels = <span class="fn">merit.process.time_window</span>(channels, opts.<span class="ann">Window</span>);
+  <span class="kw">end</span>
+  <span class="kw">if</span> ~<span class="fn">isempty</span>(opts.<span class="ann">Speed</span>)
+    channels.<span class="ann">speed</span> = opts.<span class="ann">Speed</span>;
+  <span class="kw">end</span>
+
+  <span class="cm">% ── Step 4: Build settings struct for algorithm ──────────</span>
+  settings.<span class="ann">apodization</span> = opts.<span class="ann">Apodization</span>;
+
+  <span class="cm">% ── Step 5: Call the algorithm ───────────────────────────</span>
+  image = <span class="fn">alg_fn</span>(channels, points, settings);
+
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Pro Tip: Bypass the Wrapper</div>
+      <p>For batch processing (many phantoms), calling <code>merit()</code> re-runs <code>inputParser</code> and preprocessing every time. Pre-compute the filtered channels once, then call the algorithm function directly: <code>merit.algorithms.das(channels_filtered, points, settings)</code> — this can be 2–5× faster in loops.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 8 — Signal Processing Chain -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s8">
+  <div class="section-label">Section 08</div>
+  <h2>Signal Processing Chain</h2>
+
+  <p>
+    Raw S-parameter data from a VNA (Vector Network Analyzer) cannot be fed directly into a beamformer. It must go through a chain of preprocessing steps to isolate the <em>tumor response</em>, suppress artifacts, and condition the signal for coherent summation. MERIT's <code>+process</code> sub-package handles this.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipe-step"><div class="pipe-num">①</div><div class="pipe-name">Raw S21</div><div class="pipe-sub">VNA freq. domain<br>complex S-params</div></div>
+    <div class="pipe-step"><div class="pipe-num">②</div><div class="pipe-name">Calibrate</div><div class="pipe-sub">Subtract reference<br>skin artifact removal</div></div>
+    <div class="pipe-step"><div class="pipe-num">③</div><div class="pipe-name">IFFT</div><div class="pipe-sub">Freq → Time<br>S21(f) → s21(t)</div></div>
+    <div class="pipe-step"><div class="pipe-num">④</div><div class="pipe-name">Bandpass Filter</div><div class="pipe-sub">e.g. 1–8 GHz<br>remove noise</div></div>
+    <div class="pipe-step"><div class="pipe-num">⑤</div><div class="pipe-name">Time Window</div><div class="pipe-sub">Gate valid echoes<br>remove late returns</div></div>
+    <div class="pipe-step"><div class="pipe-num">⑥</div><div class="pipe-name">Ready for DAS</div><div class="pipe-sub">channels.data<br>[N×N×T]</div></div>
+  </div>
+
+  <section id="s8a">
+  <h3>Calibration — <code>merit.process.calibrate</code></h3>
+  <p>
+    Calibration (also called <strong>subtraction-based artifact removal</strong>) removes the dominant early-time reflections from the skin interface and antenna coupling. Without it, the skin reflection is typically <strong>30–60 dB</strong> stronger than the tumor response and completely masks it.
+  </p>
+  <pre><code><span class="cm">% merit.process.calibrate removes artifact using an average reference</span>
+<span class="kw">function</span> <span class="var">ch_cal</span> = <span class="fn">calibrate</span>(<span class="var">channels_tumor</span>, <span class="var">channels_ref</span>)
+  <span class="cm">%
+  % Method 1: Direct subtraction (if reference scan exists)
+  %   ch_cal.data = channels_tumor.data - channels_ref.data;
+  %
+  % Method 2: Average subtraction (no explicit reference)
+  %   For each antenna i, the reference for channel (i,j) is
+  %   the average of all other channels involving antenna i:
+  %
+  %   ref_i = mean(data(i, :, :), 2)   <- mean over all Rx for this Tx
+  %   ch_cal.data(i,j,:) = data(i,j,:) - ref_i
+  %</span>
+  
+  <span class="kw">if</span> <span class="fn">nargin</span> == <span class="num">2</span>
+    ch_cal = channels_tumor;
+    ch_cal.<span class="ann">data</span> = channels_tumor.<span class="ann">data</span> - channels_ref.<span class="ann">data</span>;
+  <span class="kw">else</span>
+    ch_cal = channels_tumor;
+    <span class="kw">for</span> i = <span class="num">1</span>:<span class="fn">size</span>(channels_tumor.<span class="ann">data</span>,<span class="num">1</span>)
+      ref = <span class="fn">mean</span>(channels_tumor.<span class="ann">data</span>(i,:,:), <span class="num">2</span>);
+      ch_cal.<span class="ann">data</span>(i,:,:) = channels_tumor.<span class="ann">data</span>(i,:,:) - ref;
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+  </section>
+
+  <section id="s8b">
+  <h3>Bandpass Filtering — <code>merit.process.filter</code></h3>
+  <p>
+    Applied in the <strong>time domain</strong> using a zero-phase Butterworth filter. Removes out-of-band noise and limits the frequency content to the usable range of the antenna system.
+  </p>
+  <pre><code><span class="cm">% Apply 2–8 GHz bandpass filter to all channels</span>
+freq_range = [<span class="num">2e9</span>, <span class="num">8e9</span>];  <span class="cm">% Hz</span>
+channels   = <span class="fn">merit.process.filter</span>(channels, freq_range);
+
+<span class="cm">%% Internally, filter.m does:</span>
+<span class="cm">%   fs     = 1 / (channels.time(2) - channels.time(1));  % sample rate</span>
+<span class="cm">%   Wn     = freq_range / (fs/2);                         % normalized</span>
+<span class="cm">%   [b,a]  = butter(order, Wn, 'bandpass');</span>
+<span class="cm">%   For each tx-rx pair: data(i,j,:) = filtfilt(b,a, squeeze(data(i,j,:)))</span>
+<span class="cm">%   filtfilt → zero-phase (no phase distortion)</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Filter Order Selection</div>
+      <p>MERIT defaults to a Butterworth order of 3. Higher orders (5–7) give steeper roll-off but introduce more Gibbs-like ringing at sharp transitions. For UWB signals spanning 1–10 GHz, order 3–4 is usually optimal. If you see oscillatory artifacts in early-time signals post-filtering, reduce the order.</p>
+    </div>
+  </div>
+  </section>
+
+  <section id="s8c">
+  <h3>Time Windowing — <code>merit.process.time_window</code></h3>
+  <p>
+    A Hann (or rectangular) window function multiplied onto each time-domain signal. It gates the signals to include <em>only echoes returning from within the imaging domain</em>, discarding late-arriving multipath signals.
+  </p>
+  <pre><code><span class="cm">% Gate signals to include echoes from 0.5–2.0 ns (returns from &lt;30 cm)</span>
+t_window = [<span class="num">0.5e-9</span>, <span class="num">2.0e-9</span>];  <span class="cm">% seconds</span>
+channels  = <span class="fn">merit.process.time_window</span>(channels, t_window);
+
+<span class="cm">%% How to compute the correct window bounds:</span>
+<span class="cm">%  t_min = 2 * d_min / speed;   % closest antenna-to-domain edge distance</span>
+<span class="cm">%  t_max = 2 * d_max / speed;   % furthest imaging point distance</span>
+
+d_min  = <span class="num">0.005</span>;                  <span class="cm">% 5 mm (antenna offset)</span>
+d_max  = <span class="fn">sqrt</span>(<span class="num">0.07</span>^<span class="num">2</span> + <span class="num">0.06</span>^<span class="num">2</span>); <span class="cm">% corner of domain</span>
+t_min  = <span class="num">2</span>*d_min  / channels.<span class="ann">speed</span>;
+t_max  = <span class="num">2</span>*d_max  / channels.<span class="ann">speed</span>;
+<span class="code-label">MATLAB</span></code></pre>
+  </section>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 9 — Delay Calculation -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s9">
+  <div class="section-label">Section 09</div>
+  <h2>Delay Calculation — <code>merit.beamform.delay</code></h2>
+
+  <p>
+    The delay calculation is the <strong>computational heart</strong> of every time-domain beamforming algorithm. For each voxel in the imaging domain, it computes the two-way travel time for a wavefront emitted from transmitting antenna <em>i</em>, reflecting off the voxel at position <strong>p</strong>, and received at antenna <em>j</em>.
+  </p>
+
+  <div class="math-block">
+    <div class="math-eq">τ<sub>ij</sub>(p) = (|p − r<sub>i</sub>| + |p − r<sub>j</sub>|) / v<sub>eff</sub></div>
+    <div class="math-label">Round-trip propagation delay for tx antenna i → point p → rx antenna j</div>
+  </div>
+
+  <pre><code><span class="cm">%% merit.beamform.delay — annotated implementation</span>
+<span class="kw">function</span> <span class="var">delays</span> = <span class="fn">delay</span>(<span class="var">channels</span>, <span class="var">points</span>)
+  <span class="cm">% channels.antennas : [N × 3]  antenna positions</span>
+  <span class="cm">% channels.speed    : scalar   effective propagation speed</span>
+  <span class="cm">% points            : [P × 3]  imaging grid voxel coords</span>
+  <span class="cm">% delays            : [N × N × P]  two-way delay in seconds</span>
+
+  N = <span class="fn">size</span>(channels.<span class="ann">antennas</span>, <span class="num">1</span>);
+  P = <span class="fn">size</span>(points, <span class="num">1</span>);
+  v = channels.<span class="ann">speed</span>;
+
+  <span class="cm">% Distance from each antenna to each voxel: [N × P]</span>
+  <span class="kw">for</span> k = <span class="num">1</span>:N
+    diff = points - channels.<span class="ann">antennas</span>(k,:);       <span class="cm">% [P × 3] broadcast</span>
+    dist(k,:) = <span class="fn">sqrt</span>(<span class="fn">sum</span>(diff.^<span class="num">2</span>, <span class="num">2</span>))';          <span class="cm">% [1 × P]</span>
+  <span class="kw">end</span>
+
+  <span class="cm">% Two-way delay: tx i distance + rx j distance, divided by speed</span>
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      delays(i,j,:) = (dist(i,:) + dist(j,:)) / v;  <span class="cm">% [1 × P]</span>
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">Memory Warning for Large Domains</div>
+      <p>The <code>delays</code> array has shape <code>[N × N × P]</code>. For a 16-antenna array on a 2 mm grid (156k voxels): 16×16×156,401 × 8 bytes ≈ <strong>320 MB</strong>. For 32 antennas at 1 mm: over 6 GB. MERIT handles this by computing and using delays chunk-by-chunk in the algorithm functions rather than pre-allocating the full tensor.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 10 — DAS Algorithm -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s10">
+  <div class="section-label">Section 10</div>
+  <h2>DAS — Delay-and-Sum Algorithm</h2>
+
+  <p>
+    <strong>Delay-and-Sum (DAS)</strong> is the foundational beamforming algorithm — conceptually simple but highly effective for initial imaging. It works by aligning all received echoes to the same reference time (the propagation delay to a candidate voxel) and then coherently summing them. Voxels coinciding with a scatterer accumulate constructively; all other voxels partially cancel.
+  </p>
+
+  <div class="math-block">
+    <div class="math-eq">I<sub>DAS</sub>(p) = | Σ<sub>i,j ∈ M</sub> w<sub>ij</sub> · s<sub>ij</sub>(τ<sub>ij</sub>(p)) |²</div>
+    <div class="math-label">DAS image intensity at voxel p — where M is the active antenna pair mask, w are apodization weights, and s is the time-domain signal</div>
+  </div>
+
+  <h3>Step-by-Step Internal Logic</h3>
+  <pre><code><span class="kw">function</span> <span class="var">image</span> = <span class="fn">das</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">settings</span>)
+  N      = <span class="fn">size</span>(channels.<span class="ann">antennas</span>, <span class="num">1</span>);
+  P      = <span class="fn">size</span>(points, <span class="num">1</span>);
+  image  = <span class="fn">zeros</span>(P, <span class="num">1</span>);
+
+  <span class="cm">% Get apodization (spatial weighting) for all active pairs</span>
+  weights = <span class="fn">merit.beamform.apodization</span>(channels, settings);
+
+  <span class="cm">% Loop over all active transmit-receive pairs</span>
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      <span class="kw">if</span> ~channels.<span class="ann">mask</span>(i,j), <span class="kw">continue</span>; <span class="kw">end</span>
+
+      <span class="cm">% Extract signal for this tx-rx pair: [T × 1]</span>
+      sig = <span class="fn">squeeze</span>(channels.<span class="ann">data</span>(i,j,:));
+
+      <span class="cm">% Compute round-trip delay from tx i → point p → rx j: [P × 1]</span>
+      r_tx = <span class="fn">vecnorm</span>(points - channels.<span class="ann">antennas</span>(i,:), <span class="num">2</span>, <span class="num">2</span>);
+      r_rx = <span class="fn">vecnorm</span>(points - channels.<span class="ann">antennas</span>(j,:), <span class="num">2</span>, <span class="num">2</span>);
+      tau  = (r_tx + r_rx) / channels.<span class="ann">speed</span>;   <span class="cm">% [P × 1] seconds</span>
+
+      <span class="cm">% Interpolate signal at each delay (sub-sample accuracy)</span>
+      <span class="cm">% interp1 with 'linear' or 'spline' — spline is more accurate</span>
+      sig_delayed = <span class="fn">interp1</span>(channels.<span class="ann">time</span>, sig, tau, <span class="str">'linear'</span>, <span class="num">0</span>);
+
+      <span class="cm">% Accumulate weighted contribution: [P × 1]</span>
+      image = image + weights(i,j) * sig_delayed;
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+  <span class="cm">% Square to get power (envelope detection)</span>
+  image = image .^ <span class="num">2</span>;
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <h3>Apodization (Spatial Weighting)</h3>
+  <p>
+    The weight <code>w(i,j)</code> for each antenna pair modifies how much each channel contributes to the image. MERIT supports several schemes:
+  </p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Scheme</th><th>Formula</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Uniform</td><td>w = 1 for all pairs</td><td>Maximum SNR, highest sidelobes</td></tr>
+      <tr><td>Hann</td><td>cos² taper on angular separation</td><td>Reduced sidelobes, slightly lower resolution</td></tr>
+      <tr><td>Distance</td><td>w = 1/d(i,j)</td><td>Upweights close pairs</td></tr>
+      <tr><td>Custom</td><td>User-supplied N×N matrix</td><td>Full control</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ</div>
+    <div class="callout-body">
+      <div class="callout-title">DAS Limitations</div>
+      <p>DAS produces the image with the <em>highest resolution</em> among MERIT's algorithms but also the <em>highest clutter level</em> (sidelobes). Coherent grating lobes appear when inter-element spacing exceeds λ/2. For breast imaging at 6 GHz center frequency in tissue (λ ≈ 10 mm), this constrains element spacing to &lt; 5 mm for full coverage.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 11 — DMAS Algorithm -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s11">
+  <div class="section-label">Section 11</div>
+  <h2>DMAS — Delay-Multiply-and-Sum</h2>
+
+  <p>
+    <strong>DMAS</strong> is an enhanced beamformer that replaces the simple coherent summation of DAS with a <strong>pairwise multiplication</strong> of delayed signals before summation. This cross-correlation operation gives it <em>superior clutter rejection</em> at the cost of resolution (the effective beam pattern is the square of the DAS beam). It was introduced specifically for microwave breast imaging by Lim et al. (2008) and is one of MERIT's most frequently cited algorithms.
+  </p>
+
+  <div class="math-block">
+    <div class="math-eq">I<sub>DMAS</sub>(p) = Σ<sub>i&lt;j</sub> Σ<sub>k&lt;l, (k,l)≠(i,j)</sub> s<sub>ij</sub>(τ<sub>ij</sub>) · s<sub>kl</sub>(τ<sub>kl</sub>)</div>
+    <div class="math-label">DMAS: multiply all pairs of delayed signals before summing — effectively computing cross-correlation at zero-lag</div>
+  </div>
+
+  <h3>DMAS vs DAS — Key Differences</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Property</th><th>DAS</th><th>DMAS</th></tr></thead>
+    <tbody>
+      <tr><td>Mathematical operation</td><td>Linear sum</td><td>Sum of pairwise products</td></tr>
+      <tr><td>Effective beam pattern</td><td>One-way beam</td><td>Square of DAS beam</td></tr>
+      <tr><td>SCR improvement over DAS</td><td>Baseline</td><td>Typically +5 to +15 dB</td></tr>
+      <tr><td>Computational complexity</td><td>O(N²·P)</td><td>O(N⁴·P) — much slower</td></tr>
+      <tr><td>Resolution (−3 dB beamwidth)</td><td>Sharper</td><td>~40% wider</td></tr>
+      <tr><td>Clutter artifacts</td><td>Higher</td><td>Lower</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <pre><code><span class="kw">function</span> <span class="var">image</span> = <span class="fn">dmas</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">settings</span>)
+  N      = <span class="fn">size</span>(channels.<span class="ann">antennas</span>, <span class="num">1</span>);
+  P      = <span class="fn">size</span>(points, <span class="num">1</span>);
+  image  = <span class="fn">zeros</span>(P, <span class="num">1</span>);
+
+  <span class="cm">% First, compute all delayed signals: store in cell array [N×N]</span>
+  sig_del = <span class="fn">cell</span>(N, N);
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      <span class="kw">if</span> ~channels.<span class="ann">mask</span>(i,j), <span class="kw">continue</span>; <span class="kw">end</span>
+      sig = <span class="fn">squeeze</span>(channels.<span class="ann">data</span>(i,j,:));
+      tau = (<span class="fn">vecnorm</span>(points-channels.<span class="ann">antennas</span>(i,:),<span class="num">2</span>,<span class="num">2</span>) + ...
+             <span class="fn">vecnorm</span>(points-channels.<span class="ann">antennas</span>(j,:),<span class="num">2</span>,<span class="num">2</span>)) / channels.<span class="ann">speed</span>;
+      sig_del{i,j} = <span class="fn">interp1</span>(channels.<span class="ann">time</span>, sig, tau, <span class="str">'linear'</span>, <span class="num">0</span>);
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+  <span class="cm">% Get list of active pairs</span>
+  [ri, rj] = <span class="fn">find</span>(channels.<span class="ann">mask</span>);
+  M = <span class="fn">numel</span>(ri);
+
+  <span class="cm">% DMAS: multiply each unique pair of active channels</span>
+  <span class="kw">for</span> m = <span class="num">1</span>:M
+    <span class="kw">for</span> n = m+<span class="num">1</span>:M           <span class="cm">% n > m ensures no double-counting</span>
+      a = sig_del{ri(m), rj(m)};  <span class="cm">% [P × 1] delayed signal m</span>
+      b = sig_del{ri(n), rj(n)};  <span class="cm">% [P × 1] delayed signal n</span>
+      <span class="cm">% Signed sqrt multiplication preserves sign while reducing squaring</span>
+      image = image + <span class="fn">sign</span>(a.*b) .* <span class="fn">sqrt</span>(<span class="fn">abs</span>(a.*b));
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">Performance Warning</div>
+      <p>DMAS has O(M²) complexity where M is the number of active antenna pairs. For a 16-antenna full multi-static array (M = 240 pairs), the inner double-loop runs <strong>28,680 iterations</strong> per image. Pre-allocate the delayed signals and consider GPU acceleration (<code>gpuArray</code>) for real-time applications.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 12 — FD-DAS Algorithm -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s12">
+  <div class="section-label">Section 12</div>
+  <h2>Frequency-Domain DAS (<code>fd_das.m</code>)</h2>
+
+  <p>
+    Frequency-Domain DAS (FD-DAS) operates on the complex frequency-domain S-parameter data directly, without converting to time domain first. It applies a <strong>phase shift</strong> corresponding to the propagation delay, then sums — equivalent to coherent time-domain DAS, but often faster for frequency-sparse data.
+  </p>
+
+  <div class="math-block">
+    <div class="math-eq">I<sub>FD-DAS</sub>(p) = | Σ<sub>i,j ∈ M</sub> Σ<sub>f</sub> w<sub>ij</sub> · S̃<sub>ij</sub>(f) · e<sup>j2πf·τ<sub>ij</sub>(p)</sup> |²</div>
+    <div class="math-label">FD-DAS: phase-shift and coherently sum in frequency domain — equivalent to time-domain convolution with a matched filter</div>
+  </div>
+
+  <pre><code><span class="kw">function</span> <span class="var">image</span> = <span class="fn">fd_das</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">settings</span>)
+  N    = <span class="fn">size</span>(channels.<span class="ann">antennas</span>, <span class="num">1</span>);
+  P    = <span class="fn">size</span>(points, <span class="num">1</span>);
+  freq = channels.<span class="ann">freq</span>;          <span class="cm">% [1 × F]</span>
+  image = <span class="fn">zeros</span>(P, <span class="num">1</span>);
+
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      <span class="kw">if</span> ~channels.<span class="ann">mask</span>(i,j), <span class="kw">continue</span>; <span class="kw">end</span>
+
+      <span class="cm">% Frequency-domain signal for this pair: [1 × F]</span>
+      S = <span class="fn">squeeze</span>(channels.<span class="ann">fd_data</span>(i,j,:))';
+
+      <span class="cm">% Round-trip delay for all voxels: [P × 1]</span>
+      tau = (<span class="fn">vecnorm</span>(points-channels.<span class="ann">antennas</span>(i,:),<span class="num">2</span>,<span class="num">2</span>) + ...
+             <span class="fn">vecnorm</span>(points-channels.<span class="ann">antennas</span>(j,:),<span class="num">2</span>,<span class="num">2</span>)) / channels.<span class="ann">speed</span>;
+
+      <span class="cm">% Phase steering matrix: [P × F]</span>
+      <span class="cm">% Each row: e^(j*2*pi*f*tau_p) for a single voxel across all freqs</span>
+      phase = <span class="fn">exp</span>(<span class="num">1</span>j * <span class="num">2</span>*pi * tau * freq);  <span class="cm">% broadcasting: [P × F]</span>
+
+      <span class="cm">% Multiply by spectrum and sum over frequencies: [P × 1]</span>
+      <span class="cm">% This is equivalent to evaluating IFFT at delay time tau</span>
+      contribution = <span class="fn">real</span>(<span class="fn">sum</span>(phase .* S, <span class="num">2</span>));
+
+      image = image + contribution;
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+  image = image .^ <span class="num">2</span>;
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <h3>When to Use FD-DAS vs TD-DAS</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Scenario</th><th>Recommendation</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>VNA data (freq domain native)</td><td>FD-DAS</td><td>No IFFT needed, works directly on S-params</td></tr>
+      <tr><td>Sparse frequency measurements</td><td>FD-DAS</td><td>Can use non-uniform frequency points</td></tr>
+      <tr><td>FDTD simulation output</td><td>TD-DAS or FD-DAS</td><td>Both work; TD slightly more intuitive</td></tr>
+      <tr><td>Real-time / fast imaging</td><td>TD-DAS</td><td>Simpler inner loop, easier to vectorize</td></tr>
+      <tr><td>Frequency-dependent media</td><td>FD-DAS</td><td>Can incorporate dispersive propagation model</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 13 — Algorithm Dispatcher -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s13">
+  <div class="section-label">Section 13</div>
+  <h2>Algorithm Dispatcher — <code>get_algorithm.m</code></h2>
+
+  <p>
+    The dispatcher is a simple but crucial piece of the architecture. It translates a <strong>string name</strong> to a <strong>function handle</strong>, enabling the <code>merit()</code> wrapper to work generically and allowing users to pass algorithm names as strings rather than remembering full namespace paths.
+  </p>
+
+  <pre><code><span class="kw">function</span> <span class="var">alg_fn</span> = <span class="fn">get_algorithm</span>(<span class="var">algorithm</span>)
+<span class="cm">% Resolve algorithm specification to a callable function handle.</span>
+
+  <span class="kw">if</span> <span class="fn">isa</span>(algorithm, <span class="str">'function_handle'</span>)
+    <span class="cm">% Already a function handle — use directly</span>
+    alg_fn = algorithm;
+
+  <span class="kw">elseif</span> <span class="fn">ischar</span>(algorithm) || <span class="fn">isstring</span>(algorithm)
+    <span class="cm">% String → look up in registry</span>
+    <span class="kw">switch</span> <span class="fn">lower</span>(<span class="fn">char</span>(algorithm))
+      <span class="kw">case</span> <span class="str">'das'</span>
+        alg_fn = <span class="op">@</span>merit.algorithms.das;
+      <span class="kw">case</span> <span class="str">'dmas'</span>
+        alg_fn = <span class="op">@</span>merit.algorithms.dmas;
+      <span class="kw">case</span> <span class="str">'fd_das'</span>
+        alg_fn = <span class="op">@</span>merit.algorithms.fd_das;
+      <span class="kw">otherwise</span>
+        <span class="fn">error</span>(<span class="str">'merit:get_algorithm:unknown'</span>, ...
+              <span class="str">'Unknown algorithm: "%s". Valid: das, dmas, fd_das'</span>, algorithm);
+    <span class="kw">end</span>
+
+  <span class="kw">else</span>
+    <span class="fn">error</span>(<span class="str">'merit:get_algorithm:invalid'</span>, ...
+          <span class="str">'Algorithm must be a string or function handle.'</span>);
+  <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Extending the Dispatcher</div>
+      <p>To register your custom algorithm in the standard dispatcher, simply add a <code>case</code> entry. Alternatively, <strong>always pass a function handle directly</strong> to <code>merit()</code> for custom algorithms — this bypasses the dispatcher entirely and avoids any need to modify toolbox source files.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 14 — Image Quality Metrics -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s14">
+  <div class="section-label">Section 14</div>
+  <h2>Image Quality Metrics</h2>
+
+  <p>
+    MERIT provides three standard metrics for quantitatively evaluating reconstructed images. These are the same metrics used in virtually all published microwave breast imaging papers, enabling direct comparison with literature.
+  </p>
+
+  <h3>1. Signal-to-Clutter Ratio (SCR) — <code>merit.metrics.scr</code></h3>
+  <div class="math-block">
+    <div class="math-eq">SCR = 10 log₁₀ ( max<sub>p∈Ω<sub>t</sub></sub> I(p) / mean<sub>p∈Ω<sub>c</sub></sub> I(p) )</div>
+    <div class="math-label">SCR: ratio of peak intensity in tumor region to mean intensity in clutter region [dB]</div>
+  </div>
+  <pre><code><span class="cm">% Define tumor region (sphere of 1 cm radius around known location)</span>
+tumor_loc = [<span class="num">0.02</span>, <span class="num">0.01</span>, <span class="num">0.03</span>];   <span class="cm">% [x,y,z] in meters</span>
+r_tumor   = <span class="num">0.01</span>;                   <span class="cm">% 1 cm search radius</span>
+
+scr_val = <span class="fn">merit.metrics.scr</span>(image, points, tumor_loc, r_tumor);
+<span class="fn">fprintf</span>(<span class="str">'SCR = %.1f dB\n'</span>, scr_val);
+
+<span class="cm">% Internally:</span>
+<span class="cm">%   dist_to_tumor = vecnorm(points - tumor_loc, 2, 2);</span>
+<span class="cm">%   tumor_mask    = dist_to_tumor <= r_tumor;          % Ωt</span>
+<span class="cm">%   clutter_mask  = ~tumor_mask;                       % Ωc</span>
+<span class="cm">%   SCR = 10*log10(max(image(tumor_mask)) / mean(image(clutter_mask)));</span>
+<span class="code-label">MATLAB</span></code></pre>
+
+  <h3>2. Signal-to-Mean Ratio (SMR) — <code>merit.metrics.smr</code></h3>
+  <div class="math-block">
+    <div class="math-eq">SMR = 10 log₁₀ ( max<sub>p∈Ω<sub>t</sub></sub> I(p) / mean<sub>p∈Ω</sub> I(p) )</div>
+    <div class="math-label">SMR: peak signal relative to the mean over the entire imaging domain</div>
+  </div>
+
+  <h3>3. Localization Error (LE) — <code>merit.metrics.loc</code></h3>
+  <div class="math-block">
+    <div class="math-eq">LE = | p̂<sub>max</sub> − p<sub>true</sub> |</div>
+    <div class="math-label">Localization Error: Euclidean distance between image peak and true tumor position [mm]</div>
+  </div>
+  <pre><code>tumor_true = [<span class="num">0.02</span>, <span class="num">0.01</span>, <span class="num">0.03</span>];          <span class="cm">% known ground truth [m]</span>
+le_mm = <span class="fn">merit.metrics.loc</span>(image, points, tumor_true) * <span class="num">1000</span>;
+<span class="fn">fprintf</span>(<span class="str">'Localization error = %.1f mm\n'</span>, le_mm);
+<span class="code-label">MATLAB</span></code></pre>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ</div>
+    <div class="callout-body">
+      <div class="callout-title">Reporting Standards</div>
+      <p>In published breast imaging papers, a reconstruction is typically considered <em>successful</em> when SCR > 10 dB and LE &lt; 5 mm. State-of-the-art systems achieve SCR > 20 dB with DMAS or weighted DAS. Always report all three metrics for full comparability.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 17 — Adding New Algorithms -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s17">
+  <div class="section-label">Section 17</div>
+  <h2>Adding New Algorithms to MERIT</h2>
+
+  <p>
+    MERIT's architecture makes adding a new beamforming algorithm straightforward. Follow this exact procedure to ensure compatibility with all existing toolbox functions, including the dispatcher, metrics, and <code>merit()</code> wrapper.
+  </p>
+
+  <div class="contrib-step">
+    <div class="contrib-num">1</div>
+    <div class="contrib-body">
+      <h4>Create the function file</h4>
+      <p>Create a new <code>.m</code> file inside <code>+merit/+algorithms/</code>. Name it after your algorithm. The file must follow the standard signature exactly.</p>
+    </div>
+  </div>
+
+  <div class="contrib-step">
+    <div class="contrib-num">2</div>
+    <div class="contrib-body">
+      <h4>Implement the signature contract</h4>
+      <p>Your function <em>must</em> accept <code>(channels, points, settings)</code> and return a <code>P×1</code> double image vector. Deviating from this contract will break compatibility with <code>merit()</code> and the metrics pipeline.</p>
+    </div>
+  </div>
+
+  <div class="contrib-step">
+    <div class="contrib-num">3</div>
+    <div class="contrib-body">
+      <h4>Register in the dispatcher</h4>
+      <p>Add a <code>case</code> entry in <code>get_algorithm.m</code> mapping your algorithm's string name to its function handle. This is optional — you can always pass the function handle directly — but it provides a cleaner API.</p>
+    </div>
+  </div>
+
+  <div class="contrib-step">
+    <div class="contrib-num">4</div>
+    <div class="contrib-body">
+      <h4>Test against the demo data</h4>
+      <p>Run your algorithm against <code>data/example_scan.mat</code> and compare SCR, SMR, and LE against DAS baseline to validate correctness.</p>
+    </div>
+  </div>
+
+  <h3>Example: Implementing a Custom Weighted DAS (WDAS)</h3>
+  <pre><code><span class="cm">%% File: +merit/+algorithms/wdas.m
+%% Weighted Delay-and-Sum with distance-based attenuation compensation</span>
+
+<span class="kw">function</span> <span class="var">image</span> = <span class="fn">wdas</span>(<span class="var">channels</span>, <span class="var">points</span>, <span class="var">settings</span>)
+<span class="cm">%WDAS  Weighted Delay-and-Sum with attenuation compensation.
+%
+%  Extends DAS by multiplying each sample by r² (geometric spreading
+%  compensation) before summation. Improves imaging of deep targets.
+%
+%  Specific settings fields used:
+%    settings.alpha  - attenuation coefficient [Np/m], default = 20
+%</span>
+
+  <span class="cm">% Default settings</span>
+  <span class="kw">if</span> ~<span class="fn">isfield</span>(settings, <span class="str">'alpha'</span>), settings.<span class="ann">alpha</span> = <span class="num">20</span>; <span class="kw">end</span>
+
+  N      = <span class="fn">size</span>(channels.<span class="ann">antennas</span>, <span class="num">1</span>);
+  P      = <span class="fn">size</span>(points, <span class="num">1</span>);
+  image  = <span class="fn">zeros</span>(P, <span class="num">1</span>);
+  v      = channels.<span class="ann">speed</span>;
+  alpha  = settings.<span class="ann">alpha</span>;
+
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      <span class="kw">if</span> ~channels.<span class="ann">mask</span>(i,j), <span class="kw">continue</span>; <span class="kw">end</span>
+      sig = <span class="fn">squeeze</span>(channels.<span class="ann">data</span>(i,j,:));
+
+      r_tx  = <span class="fn">vecnorm</span>(points - channels.<span class="ann">antennas</span>(i,:), <span class="num">2</span>, <span class="num">2</span>);
+      r_rx  = <span class="fn">vecnorm</span>(points - channels.<span class="ann">antennas</span>(j,:), <span class="num">2</span>, <span class="num">2</span>);
+      tau   = (r_tx + r_rx) / v;
+
+      <span class="cm">% Attenuation + geometric spreading compensation weight</span>
+      path_len = r_tx + r_rx;
+      w_atten  = path_len .* <span class="fn">exp</span>(alpha * path_len);   <span class="cm">% [P × 1]</span>
+
+      sig_delayed = <span class="fn">interp1</span>(channels.<span class="ann">time</span>, sig, tau, <span class="str">'linear'</span>, <span class="num">0</span>);
+      image = image + w_atten .* sig_delayed;
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+  image = image .^ <span class="num">2</span>;
+<span class="kw">end</span>
+<span class="code-label">MATLAB — save as: +merit/+algorithms/wdas.m</span></code></pre>
+
+  <pre><code><span class="cm">%% Register in get_algorithm.m — add this case:</span>
+<span class="kw">case</span> <span class="str">'wdas'</span>
+  alg_fn = <span class="op">@</span>merit.algorithms.wdas;
+
+<span class="cm">%% Now you can call it just like built-in algorithms:</span>
+image = <span class="fn">merit</span>(channels, points, <span class="str">'wdas'</span>, <span class="str">'FreqRange'</span>, [<span class="num">1e9</span>, <span class="num">8e9</span>]);
+<span class="code-label">MATLAB</span></code></pre>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 18 — Adding New Metrics -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s18">
+  <div class="section-label">Section 18</div>
+  <h2>Adding New Image Quality Metrics</h2>
+
+  <p>
+    Custom metrics live in <code>+merit/+metrics/</code>. They receive the flat image vector and points array, and return a scalar value.
+  </p>
+
+  <h3>Example: Half-Power Beamwidth (HPBW) Metric</h3>
+  <pre><code><span class="cm">%% File: +merit/+metrics/hpbw.m
+%% Compute 3-dB half-power beamwidth around the image peak</span>
+
+<span class="kw">function</span> <span class="var">bw_mm</span> = <span class="fn">hpbw</span>(<span class="var">image</span>, <span class="var">points</span>, <span class="var">axis_dir</span>)
+<span class="cm">%HPBW  Half-power beamwidth of the peak response along a given axis.
+%
+%  bw_mm = hpbw(image, points, 'x')  % measure width along x-axis
+%  axis_dir: 'x' | 'y' | 'z'
+%</span>
+
+  <span class="cm">% Find peak voxel</span>
+  [~, idx_peak] = <span class="fn">max</span>(image);
+  peak_pos = points(idx_peak, :);
+
+  <span class="cm">% Select axis index</span>
+  ax_map = <span class="kw">struct</span>(<span class="str">'x'</span>,<span class="num">1</span>, <span class="str">'y'</span>,<span class="num">2</span>, <span class="str">'z'</span>,<span class="num">3</span>);
+  col = ax_map.(axis_dir);
+
+  <span class="cm">% Extract 1D profile along chosen axis through peak</span>
+  tol   = <span class="num">1e-4</span>;   <span class="cm">% 0.1 mm tolerance for "same line"</span>
+  other_axes = <span class="fn">setdiff</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], col);
+  on_axis = <span class="fn">all</span>(<span class="fn">abs</span>(points(:, other_axes) - peak_pos(other_axes)) &lt; tol, <span class="num">2</span>);
+  profile_img = image(on_axis);
+  profile_ax  = points(on_axis, col);
+
+  <span class="cm">% Normalize and find -3 dB crossing points</span>
+  profile_n = profile_img / <span class="fn">max</span>(profile_img);
+  half_power_thresh = <span class="num">0.5</span>;    <span class="cm">% -3 dB</span>
+
+  above = profile_n >= half_power_thresh;
+  idx_start = <span class="fn">find</span>(above, <span class="num">1</span>, <span class="str">'first'</span>);
+  idx_end   = <span class="fn">find</span>(above, <span class="num">1</span>, <span class="str">'last'</span>);
+  bw_mm     = (profile_ax(idx_end) - profile_ax(idx_start)) * <span class="num">1000</span>;
+<span class="kw">end</span>
+<span class="code-label">MATLAB — save as: +merit/+metrics/hpbw.m</span></code></pre>
+
+  <pre><code><span class="cm">% Usage:</span>
+bw_x = <span class="fn">merit.metrics.hpbw</span>(image, points, <span class="str">'x'</span>);
+bw_z = <span class="fn">merit.metrics.hpbw</span>(image, points, <span class="str">'z'</span>);
+<span class="fn">fprintf</span>(<span class="str">'Lateral BW = %.1f mm | Axial BW = %.1f mm\n'</span>, bw_x, bw_z);
+<span class="code-label">MATLAB</span></code></pre>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 19 — Adding Preprocessing -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s19">
+  <div class="section-label">Section 19</div>
+  <h2>Adding Custom Preprocessing Functions</h2>
+
+  <p>
+    Preprocessing functions in MERIT follow a <strong>transform pattern</strong>: they take a <code>channels</code> struct, modify its <code>.data</code> (or <code>.fd_data</code>) field, and return the modified struct. This makes them composable and chainable.
+  </p>
+
+  <h3>Example: Rotation Correction (Array Alignment)</h3>
+  <pre><code><span class="cm">%% File: +merit/+process/rotate_array.m
+%% Correct for rotational misalignment of the antenna array</span>
+
+<span class="kw">function</span> <span class="var">channels_out</span> = <span class="fn">rotate_array</span>(<span class="var">channels</span>, <span class="var">theta_deg</span>)
+<span class="cm">%ROTATE_ARRAY  Rotate all antenna positions around z-axis by theta_deg.
+%
+%  Useful for correcting scan-to-scan rotational misregistration
+%  in rotational array systems.</span>
+
+  theta = theta_deg * pi / <span class="num">180</span>;
+  Rz    = [<span class="fn">cos</span>(theta), -<span class="fn">sin</span>(theta), <span class="num">0</span>; ...
+           <span class="fn">sin</span>(theta),  <span class="fn">cos</span>(theta), <span class="num">0</span>; ...
+           <span class="num">0</span>,           <span class="num">0</span>,          <span class="num">1</span>];
+
+  channels_out              = channels;
+  channels_out.<span class="ann">antennas</span>    = (Rz * channels.<span class="ann">antennas</span>')';
+<span class="kw">end</span>
+<span class="code-label">MATLAB — save as: +merit/+process/rotate_array.m</span></code></pre>
+
+  <h3>Example: Entropy-Based Artifact Removal</h3>
+  <pre><code><span class="cm">%% +merit/+process/entropy_filter.m
+%% Remove channels whose time-domain signal has anomalously high entropy
+%% (suggests coupling failure or RF interference)</span>
+
+<span class="kw">function</span> <span class="var">channels_out</span> = <span class="fn">entropy_filter</span>(<span class="var">channels</span>, <span class="var">threshold</span>)
+  <span class="kw">if</span> <span class="fn">nargin</span> &lt; <span class="num">2</span>, threshold = <span class="num">3.0</span>; <span class="kw">end</span>
+
+  channels_out = channels;
+  N = <span class="fn">size</span>(channels.<span class="ann">mask</span>, <span class="num">1</span>);
+  removed_count = <span class="num">0</span>;
+
+  <span class="kw">for</span> i = <span class="num">1</span>:N
+    <span class="kw">for</span> j = <span class="num">1</span>:N
+      <span class="kw">if</span> ~channels.<span class="ann">mask</span>(i,j), <span class="kw">continue</span>; <span class="kw">end</span>
+      sig = <span class="fn">squeeze</span>(channels.<span class="ann">data</span>(i,j,:));
+      sig_norm = <span class="fn">abs</span>(sig) / <span class="fn">sum</span>(<span class="fn">abs</span>(sig));
+      H = -<span class="fn">sum</span>(sig_norm .* <span class="fn">log2</span>(sig_norm + <span class="fn">eps</span>));  <span class="cm">% Shannon entropy</span>
+      <span class="kw">if</span> H &gt; threshold
+        channels_out.<span class="ann">mask</span>(i,j) = <span class="kw">false</span>;
+        removed_count = removed_count + <span class="num">1</span>;
+      <span class="kw">end</span>
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+  <span class="fn">fprintf</span>(<span class="str">'entropy_filter: masked %d anomalous channels\n'</span>, removed_count);
+<span class="kw">end</span>
+<span class="code-label">MATLAB — save as: +merit/+process/entropy_filter.m</span></code></pre>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 20 — Tips & Best Practices -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="s20">
+  <div class="section-label">Section 20</div>
+  <h2>Tips, Hints &amp; Best Practices</h2>
+
+  <div class="summary-box">
+    <h3>🔬 Research Workflow Summary</h3>
+    <ul>
+      <li>Always <strong>calibrate first</strong> — the skin artifact is 30–60 dB above the tumor signal; no algorithm can compensate for it.</li>
+      <li>Set <code>channels.speed</code> from the coupling medium permittivity, not free space. Error here is the #1 cause of localization failures.</li>
+      <li>Use <strong>DAS first</strong> for rapid prototyping — it's the fastest to compute and easiest to debug. Switch to DMAS once the pipeline is working.</li>
+      <li>Always visualize the <code>channels.data</code> B-scan (antenna index vs. time) before running beamforming to catch preprocessing issues early.</li>
+      <li>Normalize your image by its maximum value before computing SCR/SMR to ensure consistent comparison across algorithms.</li>
+      <li>For publication, report <code>SCR</code>, <code>SMR</code>, and <code>LE</code> for all algorithms on the same phantom.</li>
+    </ul>
+  </div>
+
+  <h3>Performance Optimization Checklist</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Issue</th><th>Cause</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr><td>DAS takes hours</td><td>Fine grid + many antennas</td><td>Coarsen to 2–3 mm for iteration; use 1 mm only for final result</td></tr>
+      <tr><td>DMAS extremely slow</td><td>O(M²) complexity</td><td>Use <code>parfor</code> on outer loop; or run on GPU with <code>gpuArray</code></td></tr>
+      <tr><td>Interp1 bottleneck</td><td>Called P times per channel</td><td>Vectorize: compute all tau at once → single <code>interp1</code> call with matrix tau</td></tr>
+      <tr><td>Memory overflow</td><td>Pre-allocating N×N×P delay tensor</td><td>Process voxels in batches of 1000; never pre-allocate full tensor</td></tr>
+      <tr><td>Image has grating lobes</td><td>Antenna spacing > λ/2</td><td>Apply Hann apodization or use DMAS; cannot eliminate without denser array</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Common Bugs and Fixes</h3>
+  <details>
+    <summary>🐛 Image is all zeros or NaN</summary>
+    <div class="details-body">
+      <p><strong>Cause:</strong> <code>channels.speed</code> is too large, so all delays exceed the time window length. <code>interp1</code> returns <code>0</code> (the fill value) for out-of-range delays.</p>
+      <p><strong>Fix:</strong> Check that <code>max(tau) ≤ channels.time(end)</code> for any voxel. Print <code>max(max(tau))</code> and compare to <code>channels.time(end)</code>.</p>
+      <pre><code>max_tau = <span class="fn">max</span>(<span class="fn">vecnorm</span>(points,<span class="num">2</span>,<span class="num">2</span>)) * <span class="num">2</span> / channels.<span class="ann">speed</span>;
+<span class="fn">fprintf</span>(<span class="str">'Max delay: %.2f ns | Time window end: %.2f ns\n'</span>, max_tau*<span class="num">1e9</span>, channels.<span class="ann">time</span>(<span class="kw">end</span>)*<span class="num">1e9</span>);</code></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>🐛 Image peak appears at array center (not tumor location)</summary>
+    <div class="details-body">
+      <p><strong>Cause:</strong> Calibration has not been applied — the large early-time skin/coupling artifact focuses at the geometric center of the array.</p>
+      <p><strong>Fix:</strong> Apply <code>merit.process.calibrate</code> <em>before</em> beamforming. Verify calibration worked by checking that the B-scan no longer shows a strong coherent early arrival.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🐛 MATLAB says "merit.algorithms.myalgo not found"</summary>
+    <div class="details-body">
+      <p><strong>Cause:</strong> Either (a) the root folder is not on the MATLAB path, or (b) the file is named differently from the function name, or (c) the file is in the wrong folder.</p>
+      <p><strong>Fix:</strong> Run <code>which merit</code> — must return path to <code>merit.m</code>. Run <code>exist('merit.algorithms.myalgo', 'file')</code> — must return 2. Ensure filename exactly matches function name.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🐛 FD-DAS image is much worse than TD-DAS</summary>
+    <div class="details-body">
+      <p><strong>Cause:</strong> <code>channels.fd_data</code> was generated from a truncated time window or with incorrect FFT normalization, causing phase distortion.</p>
+      <p><strong>Fix:</strong> Ensure the IFFT/FFT pair uses consistent normalization. If converting from time domain: use <code>fft(data, [], 3)</code> with no normalization factor, and the corresponding IFFT uses <code>ifft(fd_data, [], 3) / T</code>. Verify by round-tripping a known signal.</p>
+    </div>
+  </details>
+
+  <h3>Recommended Reading for MERIT Users</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Reference</th><th>Relevance</th></tr></thead>
+    <tbody>
+      <tr><td>Porter et al. (2016) — MERIT paper, IEEE TMTT</td><td>Primary toolbox reference; describes all algorithms</td></tr>
+      <tr><td>Lim et al. (2008) — DMAS algorithm, IEEE TMTT</td><td>Original DMAS derivation</td></tr>
+      <tr><td>Fear et al. (2002) — MIST beamformer</td><td>Foundation of confocal microwave imaging</td></tr>
+      <tr><td>O'Halloran et al. (2010) — Artifact removal</td><td>Calibration strategies for breast imaging</td></tr>
+      <tr><td>Elahi et al. (2018) — DMAS variants</td><td>Improved DMAS with higher clutter rejection</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <div class="summary-box">
+    <h3>🗺 Quick Reference: Where Things Live</h3>
+    <ul>
+      <li><strong>Add a new algorithm</strong> → <code>+merit/+algorithms/youralgo.m</code> + register in <code>get_algorithm.m</code></li>
+      <li><strong>Add a new metric</strong> → <code>+merit/+metrics/yourmetric.m</code></li>
+      <li><strong>Add preprocessing</strong> → <code>+merit/+process/yourstep.m</code> (channels in → channels out)</li>
+      <li><strong>Change imaging domain</strong> → modify call to <code>merit.domain.get_domain()</code></li>
+      <li><strong>Change antenna weights</strong> → modify <code>merit.beamform.apodization()</code> or pass custom N×N weight matrix</li>
+      <li><strong>Debug signal flow</strong> → plot B-scan with <code>imagesc(squeeze(channels.data(1,:,:)))</code></li>
+      <li><strong>Check delay validity</strong> → compare <code>max(tau)</code> vs <code>channels.time(end)</code></li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- end content-wrap -->
+
+<div id="footer">
+  MERIT Toolbox — Deep Technical Reference &nbsp;·&nbsp; Prepared for ECE / Biomedical Microwave Imaging Research &nbsp;·&nbsp; Ain Shams University
+</div>
+
+</div><!-- end main -->
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const h  = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Active nav link highlighting
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const id = e.target.id;
+        const active = document.querySelector(`.nav-link[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
