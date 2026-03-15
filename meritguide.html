@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MERiT Toolbox – Complete Guide</title>
+  <style>
+    :root {
+      --primary: #1a6fa8;
+      --primary-dark: #124f7a;
+      --accent: #e84393;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1e2a36;
+      --muted: #5a6b7a;
+      --code-bg: #1e2a36;
+      --code-text: #e8f0fe;
+      --border: #d0dce8;
+      --success: #1a8a5a;
+      --warning: #c57a00;
+      --tag-bg: #e3f0fc;
+      --tag-color: #1a6fa8;
+      --radius: 10px;
+      --shadow: 0 2px 12px rgba(26,111,168,0.09);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+    nav {
+      background: var(--primary-dark); color: #fff; padding: 0 2rem;
+      display: flex; align-items: center; gap: 1rem; height: 58px;
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    nav .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 1px; color: #fff; text-decoration: none; }
+    nav .logo span { color: #7ecbff; }
+    nav .nav-links { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-left: auto; }
+    nav .nav-links a { color: #c5dff5; text-decoration: none; font-size: 0.82rem; padding: 5px 10px; border-radius: 5px; transition: background 0.2s; }
+    nav .nav-links a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .hero {
+      background: linear-gradient(120deg, var(--primary-dark) 0%, #1e6fd4 55%, #9b3fa3 100%);
+      color: #fff; padding: 3.5rem 2rem 3rem; text-align: center;
+    }
+    .hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.6rem; }
+    .hero h1 span { color: #7ecbff; }
+    .hero p { font-size: 1.1rem; color: #d0eaff; max-width: 680px; margin: 0 auto 1.5rem; }
+    .hero-badges { display: flex; justify-content: center; gap: 0.7rem; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.15); color: #fff; border-radius: 20px; padding: 4px 14px; font-size: 0.82rem; border: 1px solid rgba(255,255,255,0.25); }
+    .container { max-width: 1060px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+    @media(max-width:700px){ .grid-2 { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 1.5rem 1.6rem; margin-bottom: 1.3rem; }
+    .card-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+    .card-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .icon-blue { background: #deeeff; }
+    .icon-pink { background: #fde6f3; }
+    .icon-green { background: #d6f5e8; }
+    .icon-orange { background: #fff0d6; }
+    .icon-purple { background: #ede6ff; }
+    .card h2 { font-size: 1.18rem; font-weight: 700; color: var(--primary-dark); }
+    .card h3 { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin: 1.1rem 0 0.4rem; }
+    .section-title { font-size: 1.55rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 0.3rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--primary); display: inline-block; }
+    .section-desc { color: var(--muted); margin-bottom: 1.4rem; font-size: 0.97rem; }
+    section { margin-bottom: 3rem; }
+    pre {
+      background: var(--code-bg); color: var(--code-text); border-radius: 8px;
+      padding: 1.1rem 1.3rem; font-family: 'Cascadia Code','Fira Mono','Consolas',monospace;
+      font-size: 0.87rem; overflow-x: auto; margin: 0.7rem 0 0.5rem; line-height: 1.65;
+    }
+    code.inline { background: #e8f0fe; color: #124f7a; padding: 2px 7px; border-radius: 4px; font-family: 'Cascadia Code',monospace; font-size: 0.88em; }
+    .cm { color: #7ec8e3; font-style: italic; }
+    .kw { color: #f7a32e; font-weight: 600; }
+    .fn { color: #7ecbff; }
+    .st { color: #a8ff78; }
+    .nm { color: #ffda78; }
+    .op { color: #e84393; }
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.9rem; }
+    th { background: var(--primary); color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: #f0f7ff; }
+    .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-color); border-radius: 4px; padding: 2px 9px; font-size: 0.79rem; font-weight: 600; margin-right: 4px; border: 1px solid #b3d4ef; }
+    .tag-green { background: #d6f5e8; color: #1a8a5a; border-color: #a0dfbf; }
+    .steps { counter-reset: step-counter; padding-left: 0; list-style: none; }
+    .steps li { position: relative; padding: 0.65rem 0 0.65rem 3rem; border-left: 2px solid var(--border); margin-left: 1.1rem; }
+    .steps li::before { counter-increment: step-counter; content: counter(step-counter); position: absolute; left: -1.2rem; top: 0.55rem; background: var(--primary); color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; }
+    .steps li:last-child { border-left: 2px solid transparent; }
+    .alert { border-radius: 8px; padding: 0.9rem 1.1rem; margin: 0.8rem 0; font-size: 0.93rem; display: flex; gap: 0.7rem; align-items: flex-start; }
+    .alert-info { background: #e3f0fc; border-left: 4px solid var(--primary); }
+    .alert-warn { background: #fff8e3; border-left: 4px solid #f5c842; }
+    .alert-success { background: #d6f5e8; border-left: 4px solid #1a8a5a; }
+    .alert-icon { font-size: 1.1rem; }
+    .file-tree { font-family: monospace; font-size: 0.88rem; line-height: 2; background: #f0f5fb; border-radius: 8px; padding: 1rem 1.3rem; border: 1px solid var(--border); }
+    .ft-dir { color: var(--primary-dark); font-weight: 700; }
+    .ft-file { color: #3a5a7a; }
+    .ft-comment { color: #9aa; font-style: italic; }
+    .ft-indent { padding-left: 1.5rem; }
+    .ft-indent2 { padding-left: 3rem; }
+    .pipeline { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 1rem 0; }
+    .pipe-step { background: var(--primary); color: #fff; border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .pipe-arrow { color: var(--primary); font-size: 1.3rem; padding: 0 6px; font-weight: 700; }
+    footer { background: var(--primary-dark); color: #8abadd; text-align: center; padding: 1.5rem; font-size: 0.85rem; margin-top: 3rem; }
+    footer a { color: #7ecbff; }
+    p { margin: 0.4rem 0 0.6rem; }
+    ul, ol { padding-left: 1.4rem; }
+    li { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#top"><span>MERiT</span> Toolbox Guide</a>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#installation">Setup</a>
+    <a href="#data">Input Data</a>
+    <a href="#signals">Signal Mgmt</a>
+    <a href="#domain">Domain</a>
+    <a href="#das">DAS Beamforming</a>
+    <a href="#visualization">Visualization</a>
+    <a href="#workflow">Full Workflow</a>
+  </div>
+</nav>
+
+<div class="hero" id="top">
+  <h1><span>MERiT</span> Microwave Radar-based Imaging Toolbox</h1>
+  <p>A complete developer guide to loading data, managing signals, performing DAS beamforming, and visualizing breast cancer microwave images in 2D and 3D.</p>
+  <div class="hero-badges">
+    <span class="badge">&#128302; Breast Cancer Detection</span>
+    <span class="badge">&#128225; Radar Microwave Imaging</span>
+    <span class="badge">&#9881;&#65039; MATLAB Toolbox</span>
+    <span class="badge">&#128194; Open Source &#8211; Apache 2.0</span>
+    <span class="badge">&#128187; GPU &amp; Parallel Ready</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- SECTION 1: OVERVIEW -->
+<section id="overview">
+  <div class="section-title">What is MERiT?</div>
+  <p class="section-desc">Understanding the toolbox architecture and imaging pipeline</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-blue">&#129504;</div><h2>Core Purpose</h2></div>
+      <p>MERiT (<strong>Microwave Radar-based Imaging Toolbox</strong>) is a free, open-source MATLAB framework developed by EMFMed for reconstructing radar-based images in medical settings. Its primary application is detecting tumors in breast tissue using ultra-wideband (UWB) microwave pulses transmitted and received by antenna arrays surrounding the breast.</p>
+      <p>The core physical principle: cancerous tissue has significantly different <em>dielectric properties</em> than healthy fatty breast tissue. Microwave pulses reflect differently off tumors, and these scattered signals are computationally focused into an image.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-pink">&#127959;&#65039;</div><h2>Toolbox Architecture</h2></div>
+      <p>MERiT is organized as a MATLAB package (the <code class="inline">+merit</code> namespace) containing several sub-packages:</p>
+      <table>
+        <tr><th>Sub-package</th><th>Role</th></tr>
+        <tr><td><code class="inline">merit.signals</code></td><td>Signal loading &amp; management</td></tr>
+        <tr><td><code class="inline">merit.domain</code></td><td>Define 3D imaging domain</td></tr>
+        <tr><td><code class="inline">merit.beamform</code></td><td>Delay calculation &amp; beamforming</td></tr>
+        <tr><td><code class="inline">merit.beamformers</code></td><td>Algorithm definitions (DAS, DMAS)</td></tr>
+        <tr><td><code class="inline">merit.visualize</code></td><td>2D slices &amp; 3D rendering</td></tr>
+        <tr><td><code class="inline">merit.metrics</code></td><td>SCR, SMR image quality</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-green">&#128260;</div><h2>Complete Imaging Pipeline</h2></div>
+    <div class="pipeline">
+      <div class="pipe-step">1. Load Data</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">2. Artefact Removal</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">3. Signal Management</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">4. Define Domain</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">5. Compute Delays</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">6. DAS Beamform</div><div class="pipe-arrow">&#8594;</div>
+      <div class="pipe-step">7. Visualize</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: INSTALLATION -->
+<section id="installation">
+  <div class="section-title">Installation &amp; Setup</div>
+  <p class="section-desc">How to get MERiT running in MATLAB</p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-orange">&#128230;</div><h2>Requirements</h2></div>
+      <ul>
+        <li>MATLAB R2019b or newer recommended</li>
+        <li>Works on Windows, macOS, and Linux</li>
+        <li>Optional: Parallel Computing Toolbox (for GPU/parallel acceleration)</li>
+        <li>No additional MATLAB toolboxes strictly required for basic use</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-purple">&#11015;&#65039;</div><h2>Download</h2></div>
+      <p><strong>Clone via Git:</strong></p>
+      <pre>git clone https://github.com/EMFMed/MERIT.git</pre>
+      <p><strong>Direct Download:</strong></p>
+      <pre>https://github.com/EMFMed/MERIT/archive/master.zip</pre>
+      <p><strong>Add to MATLAB path:</strong></p>
+      <pre>addpath(<span class="st">'/path/to/MERIT'</span>);</pre>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">&#128193;</div><h2>Repository File Structure</h2></div>
+    <div class="file-tree">
+      <div class="ft-dir">MERIT/</div>
+      <div class="ft-indent">
+        <div class="ft-dir">+merit/ &nbsp;&nbsp;<span class="ft-comment">&#8592; Main MATLAB package namespace</span></div>
+        <div class="ft-indent2">
+          <div class="ft-dir">+signals/ &nbsp;<span class="ft-comment">&#8592; Signal management functions</span></div>
+          <div class="ft-dir">+domain/ &nbsp;&nbsp;<span class="ft-comment">&#8592; Imaging domain constructors</span></div>
+          <div class="ft-dir">+beamform/ <span class="ft-comment">&#8592; Delay calculation + beamforming engine</span></div>
+          <div class="ft-dir">+beamformers/ <span class="ft-comment">&#8592; DAS and other algorithm definitions</span></div>
+          <div class="ft-dir">+visualize/ &nbsp;<span class="ft-comment">&#8592; 2D slice and 3D image rendering</span></div>
+          <div class="ft-dir">+metrics/ &nbsp;&nbsp;<span class="ft-comment">&#8592; SCR, SMR quality metrics</span></div>
+        </div>
+        <div class="ft-dir">example_data/ <span class="ft-comment">&#8592; Sample BRIGID dataset (CSV files)</span></div>
+        <div class="ft-indent2">
+          <div class="ft-file">frequencies.csv</div>
+          <div class="ft-file">antenna_locations.csv</div>
+          <div class="ft-file">channel_names.csv</div>
+          <div class="ft-file">B0_P3_p000.csv &nbsp;<span class="ft-comment">&#8592; Scan at 0&#176; rotation</span></div>
+          <div class="ft-file">B0_P3_p036.csv &nbsp;<span class="ft-comment">&#8592; Scan at 36&#176; rotation</span></div>
+        </div>
+        <div class="ft-file">getting_started.m &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">&#8592; Step-by-step tutorial script</span></div>
+        <div class="ft-file">beamform_and_display.m <span class="ft-comment">&#8592; Minimal working example</span></div>
+        <div class="ft-file">load_example_data.m &nbsp;&nbsp;<span class="ft-comment">&#8592; Helper to load all CSV data</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: INPUT DATA -->
+<section id="data">
+  <div class="section-title">Input Data</div>
+  <p class="section-desc">What files to prepare, their formats, and how to load them</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">&#128203;</div><h2>Required Input Files</h2></div>
+    <p>MERiT requires <strong>four types of data</strong> provided as CSV files or MATLAB arrays:</p>
+    <table>
+      <tr><th>File / Variable</th><th>Description</th><th>Dimensions</th><th>Units</th></tr>
+      <tr><td><code class="inline">frequencies.csv</code></td><td>List of measurement frequencies (UWB sweep)</td><td><em>F &times; 1</em> vector</td><td>Hz (e.g., 1e9 to 9e9)</td></tr>
+      <tr><td><code class="inline">antenna_locations.csv</code></td><td>3D Cartesian coordinates of each antenna phase center</td><td><em>N &times; 3</em> matrix [x, y, z]</td><td>Meters</td></tr>
+      <tr><td><code class="inline">channel_names.csv</code></td><td>Transmit/receive antenna index pairs for each channel</td><td><em>C &times; 2</em> matrix [Tx, Rx]</td><td>Integer indices</td></tr>
+      <tr><td><code class="inline">scan_data.csv</code></td><td>Complex S-parameter (S21) measurements per channel per frequency</td><td><em>C &times; F</em> matrix</td><td>Complex linear</td></tr>
+    </table>
+    <div class="alert alert-info">
+      <span class="alert-icon">&#128161;</span>
+      <div>You need <strong>at least two scan files</strong> captured at different antenna rotations (e.g., 0&#176; and 36&#176;) to perform <em>rotational subtraction</em> artefact removal, which cancels the dominant skin reflection and isolates the tumor response.</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-green">&#128194;</div><h2>Loading Data Manually</h2></div>
+      <pre><span class="cm">%% Load each CSV file individually</span>
+frequencies = dlmread(<span class="st">'example_data/frequencies.csv'</span>);
+<span class="cm">% F&#215;1 vector of frequency values in Hz</span>
+
+antenna_locations = dlmread(<span class="st">'example_data/antenna_locations.csv'</span>);
+<span class="cm">% N&#215;3 matrix: [x y z] per antenna, in meters</span>
+
+channel_names = dlmread(<span class="st">'example_data/channel_names.csv'</span>);
+<span class="cm">% C&#215;2 matrix: [Tx_index Rx_index] per channel</span>
+
+scan1 = dlmread(<span class="st">'example_data/B0_P3_p000.csv'</span>);
+<span class="cm">% C&#215;F complex matrix: scan at rotation 0&#176;</span>
+
+scan2 = dlmread(<span class="st">'example_data/B0_P3_p036.csv'</span>);
+<span class="cm">% C&#215;F complex matrix: scan at rotation 36&#176;</span></pre>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-orange">&#9889;</div><h2>Using the Helper Function</h2></div>
+      <pre><span class="cm">%% Use built-in helper</span>
+load_example_data()
+
+<span class="cm">% This loads into workspace:
+%   frequencies        &#8594; F&#215;1 double
+%   antenna_locations  &#8594; N&#215;3 double
+%   channel_names      &#8594; C&#215;2 double
+%   signals            &#8594; C&#215;F complex
+%                        (already subtracted)
+%
+% Equivalent to:
+%   signals = dlmread('...p000.csv')
+%           - dlmread('...p036.csv')</span></pre>
+      <div class="alert alert-success">
+        <span class="alert-icon">&#9989;</span>
+        <div>Use <code class="inline">load_example_data()</code> for a quick working environment with the BRIGID sample data.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-pink">&#128260;</div><h2>Artefact Removal: Rotational Subtraction</h2></div>
+    <p>Raw microwave signals are dominated by the strong skin-surface reflection. Rotational subtraction cancels it:</p>
+    <pre><span class="cm">%% Isolate tumor response by rotational subtraction</span>
+<span class="cm">% Scans at 0&#176; and 36&#176; have nearly identical skin reflections.
+% Subtraction cancels the skin artefact, leaving the tumor signal.</span>
+
+signals = scan1 - scan2;
+<span class="cm">% signals: C&#215;F matrix with artefact suppressed</span></pre>
+    <div class="alert alert-warn">
+      <span class="alert-icon">&#9888;&#65039;</span>
+      <div>Other artefact removal methods (time-gating, frequency-domain filtering) can also be applied before passing signals to the beamformer. MERiT is agnostic to the method used.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-purple">&#128268;</div><h2>Using Your Own Experimental Data</h2></div>
+    <p>To use MERiT with your own VNA + antenna array measurements:</p>
+    <table>
+      <tr><th>Variable</th><th>How to create it</th></tr>
+      <tr><td><code class="inline">frequencies</code></td><td>Export frequency sweep from VNA as a column vector in Hz</td></tr>
+      <tr><td><code class="inline">antenna_locations</code></td><td>Measure or simulate the 3D phase center of each antenna [x,y,z] in meters</td></tr>
+      <tr><td><code class="inline">channel_names</code></td><td>List all [Tx, Rx] index pairs you measured (full or selected channels)</td></tr>
+      <tr><td><code class="inline">signals</code></td><td>Export S21 from VNA as complex matrix (C&#215;F), then subtract reference scan</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 4: SIGNAL MANAGEMENT -->
+<section id="signals">
+  <div class="section-title">Signal Management</div>
+  <p class="section-desc">Functions in <code class="inline">merit.signals</code> &#8212; filtering, reordering, and selecting channels</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">&#128225;</div><h2>Purpose</h2></div>
+    <p>Before beamforming, you often need to filter or reorganize your signal set. The <code class="inline">merit.signals</code> sub-package provides utilities to:</p>
+    <ul>
+      <li>Keep only <strong>monostatic</strong> channels (Tx = Rx, same antenna transmits and receives)</li>
+      <li>Keep only <strong>bistatic</strong> channels (Tx &#8800; Rx, different antennas)</li>
+      <li>Exclude specific channels that are noisy or faulty</li>
+      <li>Reorder antenna index numbering for consistency</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-pink">&#128295;</div><h2>Signal Management Functions</h2></div>
+    <h3>get_monostatic &#8212; Keep same-antenna channels only</h3>
+    <pre><span class="cm">%% Keep only monostatic channels (Tx == Rx)</span>
+[signals_mono, channels_mono] = merit.signals.get_monostatic( ...
+    signals, channel_names);
+
+<span class="cm">% signals_mono  &#8594; reduced C'&#215;F matrix
+% channels_mono &#8594; C'&#215;2 index list of kept channels</span></pre>
+    <div class="alert alert-info">
+      <span class="alert-icon">&#128161;</span>
+      <div>Monostatic mode is simpler to implement in hardware. Bistatic captures more spatial diversity and generally yields better image quality.</div>
+    </div>
+    <h3>get_bistatic &#8212; Keep cross-antenna channels only</h3>
+    <pre><span class="cm">%% Keep only bistatic channels (Tx ~= Rx)</span>
+[signals_bi, channels_bi] = merit.signals.get_bistatic( ...
+    signals, channel_names);
+<span class="cm">% Filters out self-coupling (diagonal channels where Tx==Rx)</span></pre>
+    <h3>exclude_channels &#8212; Remove specific faulty channels</h3>
+    <pre><span class="cm">%% Exclude noisy or faulty channels by row index</span>
+bad_channels = [3, 7, 12];
+[signals_clean, channels_clean] = merit.signals.exclude_channels( ...
+    signals, channel_names, bad_channels);
+<span class="cm">% Removes specified rows from signals and channel_names</span></pre>
+    <h3>reorder &#8212; Remap antenna indices</h3>
+    <pre><span class="cm">%% Reorder antenna numbering</span>
+<span class="cm">% Useful when hardware labels differ from expected ordering</span>
+new_order = [2,1,4,3,6,5,8,7];
+channel_names_reordered = merit.signals.reorder(channel_names, new_order);
+<span class="cm">% Remaps all Tx/Rx indices in channel_names accordingly</span></pre>
+    <h3>Visualizing Raw Signals</h3>
+    <pre><span class="cm">%% Plot a single channel in the frequency domain</span>
+figure();
+plot(frequencies/1e9, abs(signals(1, :)));
+xlabel(<span class="st">'Frequency (GHz)'</span>); ylabel(<span class="st">'|S21|'</span>);
+title(<span class="st">'Channel 1: Frequency Domain Signal'</span>);
+
+<span class="cm">%% Compare two scans before subtraction</span>
+figure();
+plot(frequencies/1e9, abs(scan1(1,:)), <span class="st">'b'</span>, ...
+     frequencies/1e9, abs(scan2(1,:)), <span class="st">'r--'</span>);
+legend(<span class="st">'Scan 1 (0&#176;)'</span>, <span class="st">'Scan 2 (36&#176;)'</span>);
+xlabel(<span class="st">'Frequency (GHz)'</span>); ylabel(<span class="st">'Magnitude'</span>);</pre>
+  </div>
+</section>
+
+<!-- SECTION 5: DOMAIN -->
+<section id="domain">
+  <div class="section-title">Imaging Domain</div>
+  <p class="section-desc">Functions in <code class="inline">merit.domain</code> &#8212; defining the 3D reconstruction grid</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-green">&#127758;</div><h2>What is the Imaging Domain?</h2></div>
+    <p>The imaging domain is a discrete 3D grid of points inside the breast volume. The DAS beamformer computes a reconstruction value at every grid point &#8212; essentially asking: <em>"How much reflected signal energy arrives from this location?"</em> High energy at a point indicates a strong reflector (a potential tumor).</p>
+    <p>Image resolution is directly determined by the domain's point spacing (<code class="inline">resolution</code>) and its shape and size (<code class="inline">radius</code>).</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-orange">&#128208;</div><h2>Domain Constructor Functions</h2></div>
+    <h3>merit.domain.hemisphere &#8212; Standard breast shape</h3>
+    <pre><span class="cm">%% Create a hemispherical imaging domain</span>
+[points, axes_] = merit.domain.hemisphere( ...
+    <span class="st">'radius'</span>, <span class="nm">7e-2</span>, ...        <span class="cm">% 7 cm breast radius</span>
+    <span class="st">'resolution'</span>, <span class="nm">2.5e-3</span>);   <span class="cm">% 2.5 mm grid spacing</span>
+
+<span class="cm">% points &#8594; M&#215;3 matrix: [x y z] of every grid point (meters)
+% axes_  &#8594; cell array {x_axis, y_axis, z_axis} for plotting</span></pre>
+    <div class="alert alert-warn">
+      <span class="alert-icon">&#9888;&#65039;</span>
+      <div>Finer resolution increases image quality but dramatically increases computation time. Use <strong>5 mm</strong> for fast prototyping and <strong>2.5 mm</strong> for final results.</div>
+    </div>
+    <h3>merit.domain.cylinder &#8212; Cylindrical domain</h3>
+    <pre><span class="cm">%% Cylindrical domain (for some experimental setups)</span>
+[points, axes_] = merit.domain.cylinder( ...
+    <span class="st">'radius'</span>, <span class="nm">6e-2</span>, ...
+    <span class="st">'height'</span>, <span class="nm">8e-2</span>, ...
+    <span class="st">'resolution'</span>, <span class="nm">2.5e-3</span>);</pre>
+    <h3>Output Variables</h3>
+    <table>
+      <tr><th>Output</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code class="inline">points</code></td><td><em>M &times; 3</em> double</td><td>Each row is a 3D [x,y,z] coordinate in meters of a grid point inside the domain</td></tr>
+      <tr><td><code class="inline">axes_</code></td><td>Cell {1&times;3}</td><td>Unique x, y, z axis vectors used by <code class="inline">get_slice</code> for 2D axis labeling</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 6: DAS BEAMFORMING -->
+<section id="das">
+  <div class="section-title">DAS Beamforming</div>
+  <p class="section-desc">Functions in <code class="inline">merit.beamform</code> &#8212; computing propagation delays and reconstructing the image</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-pink">&#129518;</div><h2>How DAS Works</h2></div>
+    <p><strong>Delay-and-Sum (DAS)</strong> is a synthetic aperture beamforming algorithm. For each grid point <em>p</em> in the imaging domain, it:</p>
+    <ol>
+      <li>Calculates the two-way travel time from each Tx antenna to point <em>p</em> and back to each Rx antenna</li>
+      <li>Phase-shifts (delays) each channel's signal by that travel time in the frequency domain</li>
+      <li>Coherently sums all phase-aligned signals</li>
+    </ol>
+    <p>When the grid point coincides with a real reflector (tumor), all delayed signals align <em>constructively</em> and produce a high-amplitude sum. Elsewhere, signals cancel destructively. The absolute value of the sum becomes the image intensity at that point.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">&#9201;&#65039;</div><h2>Step 1: merit.beamform.get_delays</h2></div>
+    <p>Returns a <em>delay function handle</em> that, given a set of domain points, computes the two-way propagation delay for every Tx/Rx antenna pair.</p>
+    <pre><span class="cm">%% Compute propagation delay function</span>
+delays = merit.beamform.get_delays( ...
+    channel_names, ...             <span class="cm">% C&#215;2 [Tx, Rx] channel list</span>
+    antenna_locations, ...         <span class="cm">% N&#215;3 antenna positions in meters</span>
+    <span class="st">'relative_permittivity'</span>, <span class="nm">8</span>);   <span class="cm">% &#949;_r of breast medium</span>
+
+<span class="cm">% 'delays' is a function handle.
+% Call delays(points) to get a C&#215;M delay matrix (seconds)
+% for M domain points and C channels.</span></pre>
+    <table>
+      <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code class="inline">channel_names</code></td><td><em>C &times; 2</em> int</td><td>Tx-Rx antenna index pairs; determines which signal paths are used</td></tr>
+      <tr><td><code class="inline">antenna_locations</code></td><td><em>N &times; 3</em> double</td><td>3D positions of all antennas in meters; used to compute Euclidean path lengths</td></tr>
+      <tr><td><code class="inline">'relative_permittivity'</code></td><td>scalar double</td><td>Effective dielectric constant of the medium. Affects wave speed: v = c / sqrt(&#949;_r). Use ~9 for fatty breast, ~8 for coupling fluid.</td></tr>
+    </table>
+    <div class="alert alert-warn">
+      <span class="alert-icon">&#9888;&#65039;</span>
+      <div>Choosing the correct <code class="inline">relative_permittivity</code> is critical. An incorrect value shifts all delay calculations, blurring or mislocating the tumor. For heterogeneous phantoms, use the effective average permittivity of the breast medium.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-green">&#128444;&#65039;</div><h2>Step 2: merit.beamform &#8212; Run the Beamformer</h2></div>
+    <pre><span class="cm">%% Perform DAS image reconstruction</span>
+img = abs(merit.beamform( ...
+    signals, ...               <span class="cm">% C&#215;F complex signal matrix</span>
+    frequencies, ...           <span class="cm">% F&#215;1 frequency vector in Hz</span>
+    points, ...                <span class="cm">% M&#215;3 domain grid points</span>
+    delays, ...                <span class="cm">% delay function from get_delays()</span>
+    merit.beamformers.DAS));   <span class="cm">% specify DAS algorithm</span>
+
+<span class="cm">% img &#8594; M&#215;1 vector of image intensities (one per domain point)
+% abs() gives the real-valued magnitude image</span>
+
+<span class="cm">%% Normalize for display</span>
+img_norm = img / max(img);</pre>
+    <div class="alert alert-info">
+      <span class="alert-icon">&#128161;</span>
+      <div>The raw beamformer output is <strong>complex-valued</strong>. Always apply <code class="inline">abs()</code> to get the magnitude image. Normalize with <code class="inline">img / max(img)</code> for consistent display across scans.</div>
+    </div>
+    <h3>Available Beamformers</h3>
+    <table>
+      <tr><th>Beamformer</th><th>Description</th></tr>
+      <tr><td><code class="inline">merit.beamformers.DAS</code></td><td>Standard Delay-and-Sum &#8212; coherent summation of delayed signals. Fast, widely used, good baseline performance.</td></tr>
+      <tr><td><code class="inline">merit.beamformers.DMAS</code></td><td>Delay-Multiply-and-Sum &#8212; multiplies signal pairs before summing. Reduces clutter at the cost of higher computation.</td></tr>
+    </table>
+    <h3>GPU and Parallel Acceleration</h3>
+    <pre><span class="cm">%% GPU acceleration (just pass gpuArray data)</span>
+signals_gpu = gpuArray(signals);
+frequencies_gpu = gpuArray(frequencies);
+img_gpu = abs(merit.beamform(signals_gpu, frequencies_gpu, points, delays, ...
+    merit.beamformers.DAS));
+img = gather(img_gpu);  <span class="cm">% bring result back to CPU</span>
+
+<span class="cm">%% Parallel pool (MATLAB Parallel Computing Toolbox)</span>
+parpool();  <span class="cm">% MERiT auto-detects the pool &#8212; no code changes needed</span></pre>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-orange">&#128202;</div><h2>Image Quality Metrics</h2></div>
+    <pre><span class="cm">%% Signal-to-Clutter Ratio (SCR)</span>
+<span class="cm">% Measures how much brighter the tumor peak is vs. background</span>
+scr = merit.metrics.scr(img, points, tumor_location, tumour_radius);
+fprintf(<span class="st">'SCR: %.2f dB
+'</span>, 20*log10(scr));
+
+<span class="cm">%% Signal-to-Mean Ratio (SMR)</span>
+smr = merit.metrics.smr(img, points, tumor_location, tumour_radius);
+fprintf(<span class="st">'SMR: %.2f dB
+'</span>, 20*log10(smr));</pre>
+    <table>
+      <tr><th>Metric</th><th>Meaning</th><th>Target</th></tr>
+      <tr><td><span class="tag">SCR</span></td><td>Peak at tumor / peak outside tumor region</td><td>Higher is better (&#8805;10 dB)</td></tr>
+      <tr><td><span class="tag tag-green">SMR</span></td><td>Peak at tumor / mean intensity across domain</td><td>Higher is better</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 7: VISUALIZATION -->
+<section id="visualization">
+  <div class="section-title">Visualization</div>
+  <p class="section-desc">Functions in <code class="inline">merit.visualize</code> &#8212; 2D slices and 3D volume rendering</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-purple">&#128444;&#65039;</div><h2>2D Slice Visualization</h2></div>
+    <p>To display a 2D image, extract a planar cross-section from the 3D reconstruction using <code class="inline">merit.visualize.get_slice</code>.</p>
+    <h3>merit.visualize.get_slice &#8212; Extract a 2D plane</h3>
+    <pre><span class="cm">%% Extract an axial (XY) slice at a specific Z depth</span>
+im_slice = merit.visualize.get_slice( ...
+    img, ...         <span class="cm">% M&#215;1 intensity vector</span>
+    points, ...      <span class="cm">% M&#215;3 domain grid points</span>
+    axes_, ...       <span class="cm">% cell array from merit.domain</span>
+    <span class="st">'z'</span>, <span class="nm">35e-3</span>);     <span class="cm">% z-coordinate of slice (35 mm depth)</span>
+
+<span class="cm">% im_slice &#8594; 2D matrix (Nx &#215; Ny), ready for imagesc()</span>
+
+figure();
+imagesc(axes_{1}*1000, axes_{2}*1000, im_slice);
+axis image; colormap hot; colorbar;
+xlabel(<span class="st">'X (mm)'</span>); ylabel(<span class="st">'Y (mm)'</span>);
+title(<span class="st">'Axial Slice at z = 35 mm'</span>);</pre>
+    <h3>All Three Orthogonal Orientations</h3>
+    <pre><span class="cm">%% Axial   &#8212; XY plane at constant Z (most common)</span>
+slice_xy = merit.visualize.get_slice(img, points, axes_, <span class="st">'z'</span>, <span class="nm">35e-3</span>);
+
+<span class="cm">%% Sagittal &#8212; XZ plane at constant Y</span>
+slice_xz = merit.visualize.get_slice(img, points, axes_, <span class="st">'y'</span>, <span class="nm">0</span>);
+
+<span class="cm">%% Coronal  &#8212; YZ plane at constant X</span>
+slice_yz = merit.visualize.get_slice(img, points, axes_, <span class="st">'x'</span>, <span class="nm">0</span>);
+
+<span class="cm">%% Display all three orthogonal views side by side</span>
+figure(<span class="st">'Name'</span>, <span class="st">'Orthogonal Views'</span>);
+subplot(1,3,1); imagesc(slice_xy); colormap hot; title(<span class="st">'Axial (XY)'</span>); axis image;
+subplot(1,3,2); imagesc(slice_xz); colormap hot; title(<span class="st">'Sagittal (XZ)'</span>); axis image;
+subplot(1,3,3); imagesc(slice_yz); colormap hot; title(<span class="st">'Coronal (YZ)'</span>); axis image;</pre>
+    <div class="alert alert-info">
+      <span class="alert-icon">&#128161;</span>
+      <div>Use the <code class="inline">hot</code> or <code class="inline">parula</code> colormap &#8212; high-intensity regions (potential tumors) appear bright white/yellow against a dark background, making them easy to spot.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">&#129321;</div><h2>3D Volume Visualization</h2></div>
+    <p>To inspect the full 3D structure of the reconstruction, reshape the intensity vector into a 3D grid and use MATLAB volumetric rendering.</p>
+    <h3>Method 1: Isosurface rendering</h3>
+    <pre><span class="cm">%% Reshape flat vector into 3D volume</span>
+Nx = length(axes_{1}); Ny = length(axes_{2}); Nz = length(axes_{3});
+img_vol = reshape(img / max(img), [Nx, Ny, Nz]);
+
+<span class="cm">%% Render isosurface at 50% of peak intensity</span>
+figure();
+fv = isosurface(img_vol, 0.5);
+patch(fv, <span class="st">'FaceColor'</span>, <span class="st">'red'</span>, <span class="st">'EdgeColor'</span>, <span class="st">'none'</span>, <span class="st">'FaceAlpha'</span>, 0.6);
+daspect([1 1 1]); view(3);
+camlight; lighting phong;
+xlabel(<span class="st">'X'</span>); ylabel(<span class="st">'Y'</span>); zlabel(<span class="st">'Z'</span>);
+title(<span class="st">'3D Isosurface &#8212; Reconstructed Image'</span>);</pre>
+    <h3>Method 2: Multi-slice stacking in 3D</h3>
+    <pre><span class="cm">%% Display multiple Z-slices stacked in 3D space</span>
+figure();
+<span class="kw">for</span> k = 1:5:Nz
+    z_val = axes_{3}(k);
+    slice_k = merit.visualize.get_slice(img, points, axes_, <span class="st">'z'</span>, z_val);
+    [X, Y] = meshgrid(axes_{1}, axes_{2});
+    Z_plane = z_val * ones(size(X));
+    surf(X*1000, Y*1000, Z_plane*1000, slice_k', ...
+        <span class="st">'EdgeColor'</span>, <span class="st">'none'</span>, <span class="st">'FaceAlpha'</span>, 0.4);
+    hold on;
+<span class="kw">end</span>
+colormap hot; colorbar; view(3); axis tight;
+xlabel(<span class="st">'X (mm)'</span>); ylabel(<span class="st">'Y (mm)'</span>); zlabel(<span class="st">'Z (mm)'</span>);
+title(<span class="st">'3D Multi-Slice Volumetric View'</span>);</pre>
+    <h3>Method 3: scatter3 point cloud</h3>
+    <pre><span class="cm">%% Show only high-intensity points as a 3D scatter</span>
+threshold = 0.3 * max(img);
+idx = img > threshold;
+
+figure();
+scatter3(points(idx,1)*1000, points(idx,2)*1000, points(idx,3)*1000, ...
+         20, img(idx), <span class="st">'filled'</span>);
+colormap hot; colorbar;
+xlabel(<span class="st">'X (mm)'</span>); ylabel(<span class="st">'Y (mm)'</span>); zlabel(<span class="st">'Z (mm)'</span>);
+title(<span class="st">'3D Point Cloud &#8212; High-Intensity Regions'</span>);</pre>
+  </div>
+</section>
+
+<!-- SECTION 8: FULL WORKFLOW -->
+<section id="workflow">
+  <div class="section-title">Complete Workflow Example</div>
+  <p class="section-desc">A full end-to-end MATLAB script from data loading to 3D visualization</p>
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-green">&#128640;</div><h2>Full Pipeline Script</h2></div>
+    <pre><span class="cm">%% ================================================
+%% MERIT Complete Imaging Pipeline
+%% Breast Cancer Detection with DAS Beamforming
+%% ================================================
+
+%% STEP 1: Add MERIT to MATLAB path</span>
+addpath(<span class="st">'/path/to/MERIT'</span>);
+
+<span class="cm">%% STEP 2: Load input data</span>
+frequencies       = dlmread(<span class="st">'example_data/frequencies.csv'</span>);
+antenna_locations = dlmread(<span class="st">'example_data/antenna_locations.csv'</span>);
+channel_names     = dlmread(<span class="st">'example_data/channel_names.csv'</span>);
+scan1             = dlmread(<span class="st">'example_data/B0_P3_p000.csv'</span>);
+scan2             = dlmread(<span class="st">'example_data/B0_P3_p036.csv'</span>);
+
+<span class="cm">%% STEP 3: Artefact removal</span>
+signals = scan1 - scan2;
+
+<span class="cm">%% STEP 4: Signal management (keep bistatic channels)</span>
+[signals, channel_names] = merit.signals.get_bistatic(signals, channel_names);
+
+<span class="cm">%% STEP 5: Define hemispherical imaging domain</span>
+[points, axes_] = merit.domain.hemisphere( ...
+    <span class="st">'radius'</span>, <span class="nm">7e-2</span>, ...
+    <span class="st">'resolution'</span>, <span class="nm">2.5e-3</span>);
+
+<span class="cm">%% STEP 6: Compute propagation delays</span>
+delays = merit.beamform.get_delays( ...
+    channel_names, antenna_locations, ...
+    <span class="st">'relative_permittivity'</span>, <span class="nm">8</span>);
+
+<span class="cm">%% STEP 7: Run DAS beamforming</span>
+img = abs(merit.beamform( ...
+    signals, frequencies, points, delays, ...
+    merit.beamformers.DAS));
+img_norm = img / max(img);
+
+<span class="cm">%% STEP 8a: 2D axial slice at z = 35 mm</span>
+im_slice = merit.visualize.get_slice(img_norm, points, axes_, <span class="st">'z'</span>, <span class="nm">35e-3</span>);
+figure(<span class="st">'Name'</span>, <span class="st">'2D Axial Slice'</span>, <span class="st">'Color'</span>, <span class="st">'k'</span>);
+imagesc(axes_{1}*1000, axes_{2}*1000, im_slice);
+axis image; colormap hot; colorbar;
+xlabel(<span class="st">'X (mm)'</span>); ylabel(<span class="st">'Y (mm)'</span>);
+title(<span class="st">'DAS Reconstruction &#8212; Axial Slice (z=35mm)'</span>);
+
+<span class="cm">%% STEP 8b: 3D isosurface rendering</span>
+Nx = length(axes_{1}); Ny = length(axes_{2}); Nz = length(axes_{3});
+img_vol = reshape(img_norm, [Nx, Ny, Nz]);
+figure(<span class="st">'Name'</span>, <span class="st">'3D Reconstruction'</span>);
+fv = isosurface(img_vol, 0.5);
+patch(fv, <span class="st">'FaceColor'</span>, <span class="st">'red'</span>, <span class="st">'EdgeColor'</span>, <span class="st">'none'</span>, <span class="st">'FaceAlpha'</span>, 0.7);
+daspect([1 1 1]); view(3); camlight; lighting phong;
+title(<span class="st">'3D Isosurface &#8212; Potential Tumor Location'</span>);
+
+<span class="cm">%% STEP 9: Image quality metrics</span>
+tumor_xyz = [0, 20e-3, 35e-3];   <span class="cm">% known tumor location [x,y,z] meters</span>
+tumor_r   = 5e-3;                 <span class="cm">% tumor radius (5 mm)</span>
+scr = merit.metrics.scr(img, points, tumor_xyz, tumor_r);
+fprintf(<span class="st">'Signal-to-Clutter Ratio: %.2f dB
+'</span>, 20*log10(scr));</pre>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-blue">&#9989;</div><h2>Quick Tips</h2></div>
+      <ul>
+        <li>Always call <code class="inline">abs()</code> on beamformer output before visualization</li>
+        <li>Normalize: <code class="inline">img / max(img)</code> for consistent colormaps</li>
+        <li>Use <code class="inline">colormap hot</code> or <code class="inline">parula</code> for clearest tumor contrast</li>
+        <li>Start with <code class="inline">resolution = 5e-3</code> for speed, refine to <code class="inline">2.5e-3</code></li>
+        <li>Tune <code class="inline">relative_permittivity</code> for your specific phantom material</li>
+        <li>Call <code class="inline">parpool()</code> before beamforming to enable parallel speedup</li>
+        <li>Compare SCR before and after signal management to assess improvement</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-pink">&#128218;</div><h2>Key References</h2></div>
+      <p><strong>Citation for MERiT:</strong></p>
+      <p style="font-size:0.87rem;color:#3a5a7a;font-style:italic;background:#f0f5fb;padding:0.7rem;border-radius:6px;">D. O'Loughlin et al., "Open-source Software for Microwave Radar-based Image Reconstruction," Proc. 12th EuCAP, London, UK, April 2018.</p>
+      <p><strong>Dataset:</strong> Sample data from the <strong>BRIGID dataset</strong> &#8212; a publicly available breast phantom microwave imaging benchmark.</p>
+      <p><strong>License:</strong> Apache 2.0 &#8212; free for academic and commercial use.</p>
+      <p><strong>GitHub:</strong> <a href="https://github.com/EMFMed/MERIT" style="color:var(--primary);">github.com/EMFMed/MERIT</a></p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>MERiT Toolbox Guide &#8212; Based on open-source software by <a href="https://github.com/EMFMed/MERIT" target="_blank">EMFMed/MERIT</a> (Apache 2.0 License) &nbsp;|&nbsp; For research use in microwave breast cancer detection</p>
+</footer>
+
+</body>
+</html>
