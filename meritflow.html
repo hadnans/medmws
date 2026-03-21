@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERIT Toolbox: Internal Execution Flow & Code Sequence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
+            background: #f5f7fb;
+            color: #1e2a3e;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0b2b3d 0%, #1a4a6f 100%);
+            color: white;
+            padding: 2rem 2rem 1.8rem 2rem;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            font-size: 1rem;
+            opacity: 0.85;
+            max-width: 800px;
+            margin-top: 0.5rem;
+        }
+
+        .badge {
+            background: #2c6e9e;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.8rem;
+            font-family: monospace;
+        }
+
+        .content {
+            padding: 2rem 2rem 2.5rem 2rem;
+        }
+
+        .flow-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sequence-card {
+            background: #ffffff;
+            border: 1px solid #e4e9f0;
+            border-radius: 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.1s ease;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #f8fafd;
+            padding: 1rem 1.6rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0f3b5c;
+        }
+
+        .card-header .type {
+            background: #e9f0f9;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            font-family: monospace;
+            color: #1e5a7d;
+        }
+
+        .card-body {
+            padding: 1.2rem 1.6rem 1.6rem 1.6rem;
+        }
+
+        .call-stack {
+            background: #fefcf5;
+            border-left: 4px solid #3b82f6;
+            padding: 0.9rem 1.2rem;
+            border-radius: 0.8rem;
+            margin: 1rem 0 1rem 0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #1e2f3e;
+        }
+
+        .step-list {
+            margin: 1rem 0 0.5rem 1.2rem;
+        }
+
+        .step-list li {
+            margin: 0.6rem 0;
+            line-height: 1.4;
+        }
+
+        .code-inline {
+            background: #f0f2f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #c7254e;
+        }
+
+        .file-tree {
+            background: #f1f5f9;
+            border-radius: 0.8rem;
+            padding: 0.8rem 1.2rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .note {
+            background: #eef2ff;
+            border-radius: 0.8rem;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            border-left: 3px solid #2563eb;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid #e2edf2;
+        }
+
+        footer {
+            background: #f9fafc;
+            border-top: 1px solid #e4e9f0;
+            padding: 1rem 2rem;
+            font-size: 0.75rem;
+            color: #4a627a;
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .content { padding: 1.2rem; }
+            .card-header h2 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>⚙️ MERIT Toolbox — Internal Execution Flow</h1>
+        <div class="sub">Microwave Radar-based Imaging Toolbox: from data loading to 3D image reconstruction.<br>Understand which functions / files are invoked when you run a typical imaging pipeline.</div>
+        <div class="badge">GitHub: EMFMed/MERIT | MATLAB based | Beamforming & Radar Imaging</div>
+    </header>
+
+    <div class="content">
+        <div class="flow-grid">
+
+            <!-- SEQUENCE 1: FULL STANDARD PIPELINE (main script example) -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>📡 Sequence 1: Complete Delay-and-Sum Imaging</h2>
+                    <div class="type">main entry: beamform_and_display.m / custom script</div>
+                </div>
+                <div class="card-body">
+                    <p>This is the primary workflow demonstrated in the <strong>README</strong> and <strong>Getting Started</strong>. When you run a typical imaging script, the following internal functions are called in order.</p>
+                    <div class="call-stack">
+                        🚀 <strong>Execution call chain (core sequence)</strong><br>
+                        1️⃣ <span class="code-inline">load_example_data.m</span> (or user data loading)<br>
+                        &nbsp;&nbsp;&nbsp;├─ reads <span class="code-inline">frequencies.csv</span> , <span class="code-inline">antenna_locations.csv</span> , <span class="code-inline">channel_names.csv</span><br>
+                        &nbsp;&nbsp;&nbsp;└─ loads S-parameter scans: e.g. <span class="code-inline">B0_P3_p000.csv</span> , background subtraction<br><br>
+                        2️⃣ Signal preprocessing (manual or via helper)<br>
+                        &nbsp;&nbsp;&nbsp;└─ rotation / reference subtraction → raw signals matrix<br><br>
+                        3️⃣ <span class="code-inline">merit.domain.hemisphere()</span> → creates imaging grid points & axes<br>
+                        &nbsp;&nbsp;&nbsp;├─ located in <strong>+merit/+domain/hemisphere.m</strong><br>
+                        &nbsp;&nbsp;&nbsp;└─ returns <span class="code-inline">points [Nx3]</span> , axes struct<br><br>
+                        4️⃣ <span class="code-inline">merit.beamform.get_delays()</span> → computes propagation delays<br>
+                        &nbsp;&nbsp;&nbsp;├─ file: <strong>+merit/+beamform/get_delays.m</strong><br>
+                        &nbsp;&nbsp;&nbsp;├─ uses antenna locations, channel names & relative permittivity (or multi-layer)<br>
+                        &nbsp;&nbsp;&nbsp;└─ returns delay matrix [num_channels x num_points]<br><br>
+                        5️⃣ <span class="code-inline">merit.beamform( signals, frequencies, points, delays, beamformer )</span><br>
+                        &nbsp;&nbsp;&nbsp;├─ main imaging function: <strong>+merit/beamform.m</strong><br>
+                        &nbsp;&nbsp;&nbsp;├─ internally calls the selected beamformer: <span class="code-inline">merit.beamformers.DAS</span> (Delay-And-Sum)<br>
+                        &nbsp;&nbsp;&nbsp;├─ also supports <span class="code-inline">DMAS</span> , <span class="code-inline">MUSIC</span> (if available in <strong>+merit/+beamformers/</strong>)<br>
+                        &nbsp;&nbsp;&nbsp;└─ returns complex image volume <span class="code-inline">img</span><br><br>
+                        6️⃣ <span class="code-inline">merit.visualize.get_slice()</span> → extract 2D slice from 3D volume<br>
+                        &nbsp;&nbsp;&nbsp;├─ file: <strong>+merit/+visualize/get_slice.m</strong><br>
+                        &nbsp;&nbsp;&nbsp;└─ uses imaging points and axes to interpolate slice at given plane (e.g., z=35mm)<br><br>
+                        7️⃣ MATLAB's <span class="code-inline">imagesc()</span> , <span class="code-inline">plot3</span> or <span class="code-inline">merit.visualize.plot_volume()</span> → final display
+                    </div>
+                    <div class="file-tree">
+                        📁 <strong>Key files invoked in this flow:</strong><br>
+                        +merit/beamform.m<br>
+                        +merit/+domain/hemisphere.m<br>
+                        +merit/+domain/cuboid.m<br>
+                        +merit/+beamform/get_delays.m<br>
+                        +merit/+beamform/calc_distance_delay.m<br>
+                        +merit/+beamformers/DAS.m<br>
+                        +merit/+beamformers/DMAS.m<br>
+                        +merit/+utils/validate_inputs.m<br>
+                        +merit/+visualize/get_slice.m<br>
+                        +merit/+visualize/plot_volume.m<br>
+                        example_data/*.csv<br>
+                        load_example_data.m (helper script)
+                    </div>
+                    <div class="note">
+                        💡 <strong>Parallel/GPU note:</strong> <span class="code-inline">merit.beamform()</span> automatically uses GPU arrays if input signals are on GPU, or parallel workers when configured — no code changes required.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEQUENCE 2: ALTERNATIVE BEAMFORMER + CUSTOM DOMAIN -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>🧠 Sequence 2: Custom Domain & Frequency-Dependent Delays</h2>
+                    <div class="type">alternative beamformer (DMAS / MUSIC) & dispersive media</div>
+                </div>
+                <div class="card-body">
+                    <p>MERIT allows to easily swap beamformers, define arbitrary imaging domains, and incorporate multi-layer tissue delays. Execution flow variation:</p>
+                    <ul class="step-list">
+                        <li><strong>1. Domain generation</strong> → <span class="code-inline">merit.domain.cuboid('x', [-0.05,0.05], 'resolution', 1e-3)</span> (file: <strong>+merit/+domain/cuboid.m</strong>) instead of hemisphere.</li>
+                        <li><strong>2. Delay calculation with multi‑layer permittivity</strong> → <span class="code-inline">merit.beamform.get_delays(..., 'relative_permittivity', [8, 25], 'thickness', [2e-3, 10e-3])</span> — calls <strong>+merit/+beamform/calc_multilayer_delay.m</strong> (internal helper).</li>
+                        <li><strong>3. Beamformer selection</strong> → pass <span class="code-inline">merit.beamformers.DMAS</span> (Delay-Multiply-And-Sum) or custom handle. Inside <strong>+merit/beamform.m</strong>, the function <span class="code-inline">beamformer.apply(signals, delays, freq, ...)</span> is invoked.</li>
+                        <li><strong>4. Post-processing metrics</strong> → optionally compute SCR (Signal-to-Clutter Ratio) using <span class="code-inline">merit.metrics.scr(img, target_region)</span> defined in <strong>+merit/+metrics/scr.m</strong>.</li>
+                        <li><strong>5. 3D visualization</strong> → <span class="code-inline">merit.visualize.plot_volume(img, points, 'isosurface', 0.4)</span> draws isosurface in a figure.</li>
+                    </ul>
+                    <div class="call-stack">
+                        🔁 <strong>Critical internal call graph for this variant:</strong><br>
+                        main_script.m → merit.domain.cuboid → merit.beamform.get_delays (multi‑layer) → merit.beamformers.DMAS/apply() → merit.metrics.scr → merit.visualize.plot_volume
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEQUENCE 3: SIGNAL VISUALIZATION & MANAGEMENT PIPELINE -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>📊 Sequence 3: Signal Inspection & Preprocessing Tools</h2>
+                    <div class="type">utilities: plot_mag_and_phase, channel reordering</div>
+                </div>
+                <div class="card-body">
+                    <p>MERIT includes dedicated functions to analyze raw signals before beamforming. This sequence is often used for debugging or channel quality assessment.</p>
+                    <div class="call-stack">
+                        📈 <strong>Signal analysis flow</strong><br>
+                        <strong>a)</strong> <span class="code-inline">plot_mag_and_phase.m</span> (top-level script in repo) — loads signals, plots magnitude & phase across frequencies.<br>
+                        <strong>b)</strong> Inside, calls: <span class="code-inline">merit.io.read_signals()</span> (if signals stored in S2P or custom), but most uses direct CSV.<br>
+                        <strong>c)</strong> <span class="code-inline">merit.manage.reorder_channels(channel_names, new_order)</span> → file <strong>+merit/+manage/reorder_channels.m</strong>.<br>
+                        <strong>d)</strong> <span class="code-inline">merit.manage.exclude_channels(channel_mask)</span> → exclude noisy channels before beamforming.<br>
+                        <strong>e)</strong> <span class="code-inline">merit.visualize.plot_signals(signals, frequencies, channels)</span> generates time/frequency plots.<br>
+                        <br>
+                        📁 <strong>Relevant internal files:</strong><br>
+                        +merit/+manage/reorder_channels.m<br>
+                        +merit/+manage/select_bistatic.m<br>
+                        +merit/+manage/calibrate_signals.m<br>
+                        +merit/+visualize/plot_signals.m
+                    </div>
+                    <div class="note">
+                        🧪 This pipeline does not generate an image but is essential to prepare data before calling <span class="code-inline">merit.beamform</span>. The calibration step can invoke <span class="code-inline">merit.manage.background_subtraction()</span>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEQUENCE 4: UNDER-THE-HOOD GPU / PARALLEL EXECUTION PATH -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>⚡ Sequence 4: GPU Accelerated Beamforming Internals</h2>
+                    <div class="type">performance path — automatic code branching</div>
+                </div>
+                <div class="card-body">
+                    <p>MERIT exploits GPU acceleration without explicit code changes. The underlying functions check input types and route to optimized paths.</p>
+                    <ul class="step-list">
+                        <li><strong>User code:</strong> <span class="code-inline">gpu_signals = gpuArray(signals);</span> then call <span class="code-inline">merit.beamform(gpu_signals, ...)</span>.</li>
+                        <li>Inside <strong>+merit/beamform.m</strong>, the function <span class="code-inline">validate_and_cast</span> detects GPU arrays and ensures delays & frequencies are also transferred to GPU if needed.</li>
+                        <li><strong>Beamformer execution:</strong> <span class="code-inline">merit.beamformers.DAS</span> (or other) uses <span class="code-inline">pagemtimes</span> and element-wise operations that run natively on GPU.</li>
+                        <li>Similarly, if parallel pool is enabled, the beamformer can partition points across workers using <span class="code-inline">parfor</span> inside <span class="code-inline">merit.beamform</span> — check internal helper <strong>+merit/+internal/parallel_chunk.m</strong>.</li>
+                    </ul>
+                    <div class="file-tree">
+                        🧩 <strong>GPU/Parallel supporting files:</strong><br>
+                        +merit/beamform.m  (lines ~120-180: dispatches to gpuArray path)<br>
+                        +merit/+beamformers/DAS.m (implements vectorized beamforming)<br>
+                        +merit/+internal/validate_gpu_compatibility.m<br>
+                        +merit/+internal/parallel_chunk.m
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEQUENCE 5: METRICS & IMAGE QUALITY ANALYSIS -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>📏 Sequence 5: Image Quality Metrics & Analysis</h2>
+                    <div class="type">evaluation pipeline (SCR, FWHM, localization error)</div>
+                </div>
+                <div class="card-body">
+                    <p>After image reconstruction, MERIT provides built‑in metrics to quantify image quality. The typical sequence for research-oriented runs:</p>
+                    <div class="call-stack">
+                        🧪 <strong>Metrics evaluation flow</strong><br>
+                        <span class="code-inline">img = merit.beamform(...)</span><br>
+                        ↓<br>
+                        <span class="code-inline">scr = merit.metrics.scr(img, points, target_idx, clutter_region)</span> → file <strong>+merit/+metrics/scr.m</strong><br>
+                        <span class="code-inline">smr = merit.metrics.signal_to_mean(img, target_roi)</span> → <strong>+merit/+metrics/smr.m</strong><br>
+                        <span class="code-inline">fwhm = merit.metrics.fwhm(img, points, 'threshold', 0.5)</span> → <strong>+merit/+metrics/fwhm.m</strong><br>
+                        Additionally, <span class="code-inline">merit.metrics.localization_error(estimated_peak, true_tumor_location)</span><br>
+                        ↓<br>
+                        Results aggregated and exported via <span class="code-inline">merit.io.export_metrics()</span> (JSON/CSV)
+                    </div>
+                    <div class="note">
+                        🔍 These metric functions are typically used after beamforming to benchmark algorithm performance. The source files reside in <strong>+merit/+metrics/</strong> and share a common interface: <span class="code-inline">metrics.compute(img, points, varargin)</span>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM ARCHITECTURE SUMMARY: FOLDER STRUCTURE & MODULARITY -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>🗂️ Core MERIT Package Architecture</h2>
+                    <div class="type">namespace organization & main function mapping</div>
+                </div>
+                <div class="card-body">
+                    <p>The toolbox is built using MATLAB packages (<span class="code-inline">+merit</span>). When you run <span class="code-inline">merit.beamform(...)</span>, MATLAB resolves the function from the following structure:</p>
+                    <div class="file-tree">
+                        <strong>MERIT root/</strong><br>
+                        ├── <strong>+merit/</strong><br>
+                        │   ├── beamform.m                 <span style="color:#2c6e9e;">% main imaging orchestrator</span><br>
+                        │   ├── <strong>+beamform/</strong><br>
+                        │   │   ├── get_delays.m           <span style="color:#2c6e9e;">% delay calculation (homogeneous, multilayer)</span><br>
+                        │   │   ├── calc_distance_delay.m<br>
+                        │   │   └── calc_multilayer_delay.m<br>
+                        │   ├── <strong>+beamformers/</strong><br>
+                        │   │   ├── DAS.m                  <span style="color:#2c6e9e;">% Delay-And-Sum algorithm class/function</span><br>
+                        │   │   ├── DMAS.m                 <span style="color:#2c6e9e;">% Delay-Multiply-And-Sum</span><br>
+                        │   │   └── MUSIC.m                <span style="color:#2c6e9e;">% subspace-based (optional)</span><br>
+                        │   ├── <strong>+domain/</strong><br>
+                        │   │   ├── hemisphere.m<br>
+                        │   │   └── cuboid.m<br>
+                        │   ├── <strong>+manage/</strong><br>
+                        │   │   ├── reorder_channels.m<br>
+                        │   │   ├── exclude_channels.m<br>
+                        │   │   └── calibrate_signals.m<br>
+                        │   ├── <strong>+visualize/</strong><br>
+                        │   │   ├── get_slice.m<br>
+                        │   │   ├── plot_volume.m<br>
+                        │   │   └── plot_signals.m<br>
+                        │   ├── <strong>+metrics/</strong><br>
+                        │   │   ├── scr.m<br>
+                        │   │   ├── fwhm.m<br>
+                        │   │   └── signal_to_mean.m<br>
+                        │   └── <strong>+internal/</strong>   <span style="color:#2c6e9e;">% low-level utilities</span><br>
+                        ├── example_data/<br>
+                        ├── load_example_data.m<br>
+                        ├── plot_mag_and_phase.m<br>
+                        └── beamform_and_display.m
+                    </div>
+                    <p>📌 <strong>Execution entry points:</strong> <span class="code-inline">beamform_and_display.m</span> (full demo) or any custom script that calls the <span class="code-inline">merit.*</span> namespace functions. The code is highly modular — each imaging parameter can be tuned without modifying internals.</p>
+                </div>
+            </div>
+
+            <!-- ADDITIONAL: BEHAVIOR WHEN RUNNING EXAMPLE SCRIPT -->
+            <div class="sequence-card">
+                <div class="card-header">
+                    <h2>▶️ What happens when you run "beamform_and_display.m" (default demo)</h2>
+                    <div class="type">concrete execution trace</div>
+                </div>
+                <div class="card-body">
+                    <ol class="step-list">
+                        <li><strong>Line 1-5:</strong> Calls <span class="code-inline">load_example_data.m</span> — reads antenna positions, frequencies, and two scans (background + target). Computes differential signals.</li>
+                        <li><strong>Line 8:</strong> <span class="code-inline">merit.domain.hemisphere('radius', 0.07, 'resolution', 0.0025)</span> generates ~ 3k points inside hemispherical breast model.</li>
+                        <li><strong>Line 12:</strong> <span class="code-inline">merit.beamform.get_delays(...)</span> with relative permittivity = 8 (breast tissue) → delays for every antenna-channel & focal point.</li>
+                        <li><strong>Line 15:</strong> <span class="code-inline">img = abs(merit.beamform(signals, frequencies, points, delays, merit.beamformers.DAS))</span><br>
+                        &nbsp;&nbsp;&nbsp;➡ Inside <span class="code-inline">beamform.m</span>, the signals are reshaped, delay interpolation is performed in frequency domain (phase shift), then DAS coherent summation yields complex image.</li>
+                        <li><strong>Line 18-19:</strong> <span class="code-inline">merit.visualize.get_slice</span> + <span class="code-inline">imagesc</span> → displays axial slice at z=35 mm.</li>
+                        <li><strong>Optionally</strong>, the script could compute metrics if uncommented.</li>
+                    </ol>
+                    <div class="note">
+                        ⚙️ <strong>Behind the scenes:</strong> The beamforming uses the <span class="code-inline">for</span> or <span class="code-inline">parfor</span> loop over frequencies and points, optimized with vectorized phase rotations. All delays are precomputed to avoid redundant calculations.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="font-size: 0.85rem; background: #f8f9fe; padding: 0.8rem 1rem; border-radius: 1rem;">
+            🔍 <strong>Summary:</strong> MERIT follows a clear, configurable pipeline: <strong>Data Loading → Domain Definition → Delay Computation → Beamforming (DAS/DMAS/MUSIC) → Visualization/Metrics</strong>. Every major step corresponds to a dedicated package (<span class="code-inline">+domain</span>, <span class="code-inline">+beamform</span>, <span class="code-inline">+beamformers</span>). By examining <span class="code-inline">beamform.m</span> and <span class="code-inline">get_delays.m</span>, you’ll see the core numerical implementation. GPU acceleration and parallelism are automatically leveraged based on input data type.
+        </div>
+    </div>
+    <footer>
+        Based on MERIT (EMFMed/MERIT) repository — structure inferred from source files, README, and changelog. Execution flow reflects MATLAB's namespace resolution and the modular design of the toolbox.
+    </footer>
+</div>
+</body>
+</html>
