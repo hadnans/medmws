@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTFS Modulation — A Technical Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0e17;
+    --bg2:      #0f1525;
+    --bg3:      #141d30;
+    --gold:     #d4a853;
+    --gold2:    #f0c060;
+    --teal:     #38b2ac;
+    --teal2:    #4fd1c5;
+    --muted:    #6b7a99;
+    --text:     #dde3f0;
+    --text2:    #a8b4cc;
+    --red:      #e05252;
+    --green:    #52c080;
+    --border:   rgba(212,168,83,0.18);
+    --border2:  rgba(56,178,172,0.18);
+    --glow:     rgba(212,168,83,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 16.5px;
+    line-height: 1.78;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .5;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212,168,83,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(56,178,172,0.05) 0%, transparent 60%);
+  }
+
+  .hero-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(212,168,83,0.08);
+    border: 1px solid var(--border);
+    padding: 0.4em 1.2em;
+    border-radius: 2px;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #fff;
+    max-width: 820px;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+
+  .hero h1 span { color: var(--gold); }
+
+  .hero-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--teal);
+    margin-top: 1.2rem;
+    letter-spacing: 0.04em;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+
+  .hero-desc {
+    max-width: 620px;
+    margin-top: 1.6rem;
+    color: var(--text2);
+    font-size: 1.05rem;
+    font-style: italic;
+    animation: fadeUp 0.9s 0.3s ease both;
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 2.4rem; left: 50%; transform: translateX(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    animation: bounce 2.4s 1.2s ease infinite;
+  }
+
+  /* ── NAV ── */
+  .sidebar-nav {
+    position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+    z-index: 100;
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding: 1rem 0.7rem;
+    border-right: 1px solid var(--border);
+    background: rgba(10,14,23,0.85);
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted); cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .nav-dot:hover, .nav-dot.active { background: var(--gold); transform: scale(1.4); }
+
+  .nav-dot::after {
+    content: attr(data-label);
+    position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    white-space: nowrap;
+    color: var(--gold);
+    background: rgba(10,14,23,0.9);
+    padding: 0.2em 0.6em;
+    border: 1px solid var(--border);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .nav-dot:hover::after { opacity: 1; }
+
+  /* ── LAYOUT ── */
+  main { max-width: 960px; margin: 0 auto; padding: 0 1.8rem 6rem; }
+
+  /* ── SECTION ── */
+  section {
+    padding: 5rem 0 3rem;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.8s ease both;
+    animation-play-state: paused;
+  }
+
+  section.visible { animation-play-state: running; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.8rem;
+  }
+
+  section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.8rem;
+    line-height: 1.2;
+  }
+
+  section h2 .accent { color: var(--gold); }
+
+  p { color: var(--text2); margin-bottom: 1.1rem; }
+  p strong { color: var(--text); font-weight: 600; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--bg3);
+    border-left: 3px solid var(--gold);
+    padding: 1.2rem 1.5rem;
+    margin: 1.8rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .callout.teal { border-left-color: var(--teal); }
+  .callout.red  { border-left-color: var(--red); }
+
+  .callout-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.teal .callout-title { color: var(--teal); }
+  .callout.red .callout-title   { color: var(--red); }
+
+  .callout p { margin: 0; font-size: 0.96rem; color: var(--text2); }
+
+  /* ── EQUATION ── */
+  .eq-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem 1.6rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .eq-box::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, var(--glow), transparent);
+    pointer-events: none;
+  }
+
+  .eq-box .eq {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--gold2);
+    line-height: 1.9;
+  }
+
+  .eq-box .eq-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  /* ── DIAGRAM ── */
+  .diagram-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+
+  .diagram-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+
+  .diagram-caption {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  /* ── TWO-COLUMN GRID ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.8rem 0; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 1.3rem 1.4rem;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .card:hover { border-color: var(--teal); transform: translateY(-2px); }
+
+  .card.gold-card { border-color: var(--border); }
+  .card.gold-card:hover { border-color: var(--gold); }
+
+  .card-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+
+  .card p { font-size: 0.92rem; margin: 0; }
+
+  /* ── PRO/CON TABLE ── */
+  .pro-con {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin: 1.8rem 0;
+  }
+  @media (max-width: 640px) { .pro-con { grid-template-columns: 1fr; } }
+
+  .pro-col, .con-col {
+    background: var(--bg2);
+    border-radius: 5px;
+    padding: 1.4rem;
+    border-top: 3px solid;
+  }
+
+  .pro-col { border-color: var(--green); }
+  .con-col { border-color: var(--red); }
+
+  .pro-col h3, .con-col h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .pro-col h3 { color: var(--green); }
+  .con-col h3 { color: var(--red); }
+
+  .pro-con-item {
+    display: flex; gap: 0.6rem; align-items: flex-start;
+    margin-bottom: 0.75rem;
+    font-size: 0.93rem; color: var(--text2);
+  }
+
+  .pro-con-item .dot {
+    flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%;
+    margin-top: 0.52rem;
+  }
+
+  .pro-col .dot { background: var(--green); }
+  .con-col .dot { background: var(--red); }
+
+  /* ── DOMAIN GRID VISUAL ── */
+  .domain-visual {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+    border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; margin: 1.8rem 0;
+  }
+
+  .domain-cell {
+    background: var(--bg2);
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .domain-cell:nth-child(2) { background: var(--bg3); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+
+  .domain-cell .dm-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .domain-cell .dm-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .domain-cell .dm-axes {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .dm-name.time   { color: var(--teal); }
+  .dm-name.freq   { color: #7ab8f5; }
+  .dm-name.dd     { color: var(--gold); }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; margin: 1.5rem 0; }
+
+  .step-list li {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border-left: 2px solid var(--border);
+    margin-bottom: 0.5rem;
+    background: var(--bg2);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.95rem; color: var(--text2);
+    transition: border-color 0.3s;
+  }
+
+  .step-list li:hover { border-left-color: var(--gold); }
+
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gold);
+    background: rgba(212,168,83,0.1);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 0.05rem;
+  }
+
+  /* ── APP GRID ── */
+  .app-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 1.5rem 0; }
+  @media (max-width: 640px) { .app-grid { grid-template-columns: 1fr 1fr; } }
+
+  .app-chip {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1.1rem;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .app-chip:hover { border-color: var(--teal); background: var(--bg3); }
+
+  .app-chip .app-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+  .app-chip .app-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--teal2);
+    text-transform: uppercase;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .cmp-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.92rem; }
+
+  .cmp-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .cmp-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text2);
+  }
+
+  .cmp-table tr:hover td { background: var(--bg2); }
+
+  .cmp-table td:first-child { color: var(--text); font-weight: 500; }
+
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.15em 0.6em;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  .badge-gold { background: rgba(212,168,83,0.15); color: var(--gold); }
+  .badge-teal { background: rgba(56,178,172,0.15); color: var(--teal); }
+  .badge-red  { background: rgba(224,82,82,0.15);  color: var(--red); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(8px); }
+  }
+
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+
+  /* ── INLINE CODE ── */
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+    background: rgba(212,168,83,0.1);
+    color: var(--gold2);
+    padding: 0.1em 0.4em;
+    border-radius: 2px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ─────────── SIDEBAR NAV ─────────── -->
+<nav class="sidebar-nav" id="sidenav">
+  <div class="nav-dot active" data-label="Intro"    data-target="hero"></div>
+  <div class="nav-dot"        data-label="Concept"  data-target="s-concept"></div>
+  <div class="nav-dot"        data-label="Tx/Rx"    data-target="s-txrx"></div>
+  <div class="nav-dot"        data-label="Implement" data-target="s-impl"></div>
+  <div class="nav-dot"        data-label="Apps"     data-target="s-apps"></div>
+  <div class="nav-dot"        data-label="Pros/Cons" data-target="s-procon"></div>
+</nav>
+
+<!-- ─────────── HERO ─────────── -->
+<div class="hero" id="hero">
+  <div class="hero-badge">Wireless Communications · Modulation Theory</div>
+  <h1>Orthogonal Time<br>Frequency <span>Space</span><br>Modulation</h1>
+  <div class="hero-sub">OTFS &nbsp;|&nbsp; Delay–Doppler Domain Signaling &nbsp;|&nbsp; 5G/6G Technologies</div>
+  <p class="hero-desc">A comprehensive technical reference for OTFS — the modulation paradigm designed to conquer the doubly-dispersive wireless channel.</p>
+  <div class="scroll-hint">↓ &nbsp; scroll to explore</div>
+</div>
+
+<main>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1 · CONCEPT
+═══════════════════════════════════════════ -->
+<section id="s-concept">
+  <div class="section-label">01 · Concept</div>
+  <h2>The <span class="accent">Delay–Doppler</span> Domain</h2>
+
+  <p>Classical multicarrier systems like <strong>OFDM</strong> place information symbols in the time-frequency plane. This works well when the channel is slowly varying — but in high-mobility scenarios (vehicular, LEO satellite, mmWave), rapid Doppler shifts destroy subcarrier orthogonality and cause inter-carrier interference (ICI) that is expensive to mitigate.</p>
+
+  <p><strong>OTFS</strong> (proposed by Hadani et al., 2017) takes a fundamentally different approach: it multiplexes data in the <em>delay–Doppler (DD) domain</em>, which is the natural representation of the doubly-dispersive channel. Each physical propagation path is characterized by a delay <code>τ</code> and a Doppler shift <code>ν</code>, and OTFS treats this sparsity directly.</p>
+
+  <div class="domain-visual">
+    <div class="domain-cell">
+      <div class="dm-title">Classical</div>
+      <div class="dm-name time">Time–Domain</div>
+      <div class="dm-axes">axes: t</div>
+    </div>
+    <div class="domain-cell">
+      <div class="dm-title">OFDM / MC</div>
+      <div class="dm-name freq">Time–Frequency</div>
+      <div class="dm-axes">axes: t, f</div>
+    </div>
+    <div class="domain-cell">
+      <div class="dm-title">OTFS</div>
+      <div class="dm-name dd">Delay–Doppler</div>
+      <div class="dm-axes">axes: τ, ν</div>
+    </div>
+  </div>
+
+  <p>In the DD domain the channel appears as a <strong>sparse, stable, and separable</strong> 2-D impulse response, regardless of the vehicle speed. An information symbol placed at a DD grid point <code>(l, k)</code> experiences a simple multiplicative gain from each path — there is no ICI because the entire Doppler spread is <em>captured</em> in the domain, not fought against.</p>
+
+  <div class="callout">
+    <div class="callout-title">Core Principle</div>
+    <p>OTFS exploits the fact that the wireless channel, while appearing time-varying and dispersive in the time-frequency domain, is <strong>time-invariant and compact</strong> in the delay-Doppler domain. The channel's complexity is absorbed into the domain transform, not into the equalizer.</p>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">The DD Channel Model</h3>
+
+  <p>A doubly-dispersive channel with <em>P</em> propagation paths has an input-output relation in continuous time:</p>
+
+  <div class="eq-box">
+    <div class="eq">y(t) = ∑ₚ hₚ · x(t − τₚ) · e^{j2πνₚ(t−τₚ)}</div>
+    <div class="eq-label">Continuous-time doubly-dispersive channel · P paths</div>
+  </div>
+
+  <p>where <code>hₚ</code>, <code>τₚ</code>, <code>νₚ</code> are the complex gain, delay, and Doppler shift of the <em>p</em>-th path respectively. OTFS maps this to a 2-D convolution in the DD domain:</p>
+
+  <div class="eq-box">
+    <div class="eq">Y[k,l] = ∑_{k',l'} H[k−k', l−l'] · X[k',l'] + W[k,l]</div>
+    <div class="eq-label">Discrete DD input-output relation · M×N grid</div>
+  </div>
+
+  <p>Here <code>X[k,l]</code> is a symbol placed on the DD grid (size <em>N×M</em>), <code>H[k,l]</code> is the DD channel response (sparse!), and <code>W[k,l]</code> is additive noise. This 2-D convolution structure enables powerful structured equalization.</p>
+
+  <div class="callout teal">
+    <div class="callout-title">Grid Parameters</div>
+    <p>The DD grid has <strong>N</strong> Doppler bins (index <em>k</em>) and <strong>M</strong> delay bins (index <em>l</em>). The Doppler resolution is <code>Δν = 1/(NTΔf)</code> and the delay resolution is <code>Δτ = 1/(MΔf)</code> where <em>Δf</em> is the subcarrier spacing. Total frame duration is <code>T_f = NT/M</code> samples.</p>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">The ISFFT / SFFT Transform Pair</h3>
+
+  <p>OTFS uses a pair of 2-D symplectic Fourier transforms to move between the DD and time-frequency domains:</p>
+
+  <div class="eq-box">
+    <div class="eq">
+      X_TF[n,m] = ∑_{k=0}^{N−1} ∑_{l=0}^{M−1} X[k,l] · e^{j2π(nk/N − ml/M)}<br>
+      <span style="color:var(--muted); font-size:0.85em;">Inverse Symplectic Finite Fourier Transform (ISFFT)</span>
+    </div>
+    <div class="eq-label">DD → Time-Frequency mapping at the transmitter</div>
+  </div>
+
+  <div class="eq-box">
+    <div class="eq">
+      Y[k,l] = ∑_{n=0}^{N−1} ∑_{m=0}^{M−1} Y_TF[n,m] · e^{−j2π(nk/N − ml/M)}<br>
+      <span style="color:var(--muted); font-size:0.85em;">Symplectic Finite Fourier Transform (SFFT)</span>
+    </div>
+    <div class="eq-label">Time-Frequency → DD mapping at the receiver</div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2 · TRANSMITTER & RECEIVER
+═══════════════════════════════════════════ -->
+<section id="s-txrx">
+  <div class="section-label">02 · Architecture</div>
+  <h2>Transmitter &amp; Receiver <span class="accent">Block Diagrams</span></h2>
+
+  <!-- TRANSMITTER SVG -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono',monospace">
+      <defs>
+        <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#6b7a99"/>
+        </marker>
+        <marker id="arrowG" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#d4a853"/>
+        </marker>
+      </defs>
+
+      <!-- Title -->
+      <text x="430" y="20" text-anchor="middle" font-size="10" fill="#6b7a99" letter-spacing="2" text-transform="uppercase">OTFS TRANSMITTER CHAIN</text>
+
+      <!-- Box helper: x,y,w,h,color,label,sublabel -->
+      <!-- Block 1: QAM Mapper -->
+      <rect x="10" y="45" width="110" height="56" rx="4" fill="#141d30" stroke="#6b7a99" stroke-width="1"/>
+      <text x="65" y="72" text-anchor="middle" font-size="9" fill="#dde3f0" font-weight="500">QAM</text>
+      <text x="65" y="85" text-anchor="middle" font-size="9" fill="#dde3f0">MAPPER</text>
+      <text x="65" y="97" text-anchor="middle" font-size="7.5" fill="#6b7a99">bits → X[k,l]</text>
+
+      <!-- Block 2: ISFFT -->
+      <rect x="160" y="45" width="120" height="56" rx="4" fill="#141d30" stroke="#d4a853" stroke-width="1.5"/>
+      <text x="220" y="69" text-anchor="middle" font-size="9" fill="#d4a853" font-weight="600">ISFFT</text>
+      <text x="220" y="82" text-anchor="middle" font-size="8" fill="#a8b4cc">2D Symplectic</text>
+      <text x="220" y="95" text-anchor="middle" font-size="7.5" fill="#6b7a99">DD → TF plane</text>
+
+      <!-- Block 3: Heisenberg -->
+      <rect x="330" y="45" width="140" height="56" rx="4" fill="#141d30" stroke="#d4a853" stroke-width="1.5"/>
+      <text x="400" y="69" text-anchor="middle" font-size="9" fill="#d4a853" font-weight="600">HEISENBERG Tx</text>
+      <text x="400" y="82" text-anchor="middle" font-size="8" fill="#a8b4cc">Pulse shaping</text>
+      <text x="400" y="95" text-anchor="middle" font-size="7.5" fill="#6b7a99">TF → s(t) waveform</text>
+
+      <!-- Block 4: CP Insertion -->
+      <rect x="520" y="45" width="110" height="56" rx="4" fill="#141d30" stroke="#38b2ac" stroke-width="1"/>
+      <text x="575" y="72" text-anchor="middle" font-size="9" fill="#38b2ac">CP / ZP</text>
+      <text x="575" y="85" text-anchor="middle" font-size="9" fill="#a8b4cc">INSERT</text>
+      <text x="575" y="97" text-anchor="middle" font-size="7.5" fill="#6b7a99">guard interval</text>
+
+      <!-- Block 5: RF / DAC -->
+      <rect x="680" y="45" width="110" height="56" rx="4" fill="#141d30" stroke="#6b7a99" stroke-width="1"/>
+      <text x="735" y="72" text-anchor="middle" font-size="9" fill="#dde3f0">DAC / RF</text>
+      <text x="735" y="85" text-anchor="middle" font-size="9" fill="#a8b4cc">UPCONVERT</text>
+      <text x="735" y="97" text-anchor="middle" font-size="7.5" fill="#6b7a99">baseband → RF</text>
+
+      <!-- Antenna icon -->
+      <line x1="805" y1="73" x2="840" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow)"/>
+      <line x1="840" y1="50" x2="840" y2="96" stroke="#6b7a99" stroke-width="1.5"/>
+      <line x1="840" y1="60" x2="855" y2="45" stroke="#6b7a99" stroke-width="1.2"/>
+      <line x1="840" y1="73" x2="858" y2="58" stroke="#6b7a99" stroke-width="1.2"/>
+      <line x1="840" y1="86" x2="855" y2="100" stroke="#6b7a99" stroke-width="1.2"/>
+
+      <!-- Arrows between blocks -->
+      <line x1="120" y1="73" x2="158" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow)"/>
+      <line x1="280" y1="73" x2="328" y2="73" stroke="#d4a853" stroke-width="1.5" marker-end="url(#arrowG)"/>
+      <line x1="470" y1="73" x2="518" y2="73" stroke="#d4a853" stroke-width="1.5" marker-end="url(#arrowG)"/>
+      <line x1="630" y1="73" x2="678" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow)"/>
+
+      <!-- Labels beneath -->
+      <text x="139" y="140" text-anchor="middle" font-size="7.5" fill="#6b7a99">X[k,l]</text>
+      <line x1="139" y1="101" x2="139" y2="130" stroke="#6b7a99" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="305" y="140" text-anchor="middle" font-size="7.5" fill="#d4a853">X_TF[n,m]</text>
+      <line x1="305" y1="101" x2="305" y2="130" stroke="#d4a853" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="495" y="140" text-anchor="middle" font-size="7.5" fill="#d4a853">s(t)</text>
+      <line x1="495" y1="101" x2="495" y2="130" stroke="#d4a853" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="655" y="140" text-anchor="middle" font-size="7.5" fill="#6b7a99">s_cp(t)</text>
+      <line x1="655" y1="101" x2="655" y2="130" stroke="#6b7a99" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <!-- Legend: gold = OTFS-specific, gray = standard -->
+      <rect x="10" y="165" width="10" height="10" fill="none" stroke="#d4a853" stroke-width="1.5"/>
+      <text x="25" y="174" font-size="8" fill="#d4a853">OTFS-specific blocks</text>
+      <rect x="155" y="165" width="10" height="10" fill="none" stroke="#6b7a99" stroke-width="1"/>
+      <text x="170" y="174" font-size="8" fill="#6b7a99">Standard RF chain</text>
+    </svg>
+    <div class="diagram-caption">Fig 1 — OTFS Transmitter Block Diagram</div>
+  </div>
+
+  <p>The transmitter chain works as follows:</p>
+
+  <ul class="step-list">
+    <li><span class="step-num">1</span><div><strong>QAM Mapping:</strong> Information bits are mapped to complex symbols <code>X[k,l]</code> placed on the N×M delay-Doppler grid. Each grid point corresponds to a unique (Doppler-bin, delay-bin) pair.</div></li>
+    <li><span class="step-num">2</span><div><strong>ISFFT:</strong> The 2-D Inverse Symplectic Fourier Transform converts <code>X[k,l]</code> from the DD plane to the time-frequency plane <code>X_TF[n,m]</code>. This is the key operation — it "spreads" each DD symbol across all time-frequency resources, earning full diversity.</div></li>
+    <li><span class="step-num">3</span><div><strong>Heisenberg Transform (Pulse Shaping):</strong> A transmit pulse <code>g_tx(t)</code> (often a rectangular or root-raised cosine pulse) modulates the TF coefficients to produce the continuous-time signal <code>s(t)</code>. In the rectangular case this reduces to a Gabor expansion.</div></li>
+    <li><span class="step-num">4</span><div><strong>Cyclic Prefix / Zero Padding:</strong> A CP or ZP of length ≥ maximum delay spread is appended to each block to prevent inter-block interference and to facilitate simple frequency-domain equalization.</div></li>
+    <li><span class="step-num">5</span><div><strong>DAC / RF Upconversion:</strong> The baseband signal is converted to analog and upconverted to the carrier frequency for transmission — identical to any standard RF front-end.</div></li>
+  </ul>
+
+  <!-- RECEIVER SVG -->
+  <div class="diagram-wrap" style="margin-top:2.5rem;">
+    <svg viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono',monospace">
+      <defs>
+        <marker id="arrow2" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#6b7a99"/>
+        </marker>
+        <marker id="arrowT" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#38b2ac"/>
+        </marker>
+      </defs>
+
+      <text x="430" y="20" text-anchor="middle" font-size="10" fill="#6b7a99" letter-spacing="2">OTFS RECEIVER CHAIN</text>
+
+      <!-- Antenna -->
+      <line x1="15" y1="50" x2="15" y2="96" stroke="#6b7a99" stroke-width="1.5"/>
+      <line x1="15" y1="60" x2="0" y2="45" stroke="#6b7a99" stroke-width="1.2"/>
+      <line x1="15" y1="73" x2="0" y2="58" stroke="#6b7a99" stroke-width="1.2"/>
+      <line x1="15" y1="86" x2="0" y2="100" stroke="#6b7a99" stroke-width="1.2"/>
+      <line x1="18" y1="73" x2="50" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow2)"/>
+
+      <!-- Block 1: RF/ADC -->
+      <rect x="52" y="45" width="110" height="56" rx="4" fill="#141d30" stroke="#6b7a99" stroke-width="1"/>
+      <text x="107" y="72" text-anchor="middle" font-size="9" fill="#dde3f0">ADC / RF</text>
+      <text x="107" y="85" text-anchor="middle" font-size="9" fill="#a8b4cc">DOWNCONVERT</text>
+      <text x="107" y="97" text-anchor="middle" font-size="7.5" fill="#6b7a99">RF → baseband</text>
+
+      <!-- Block 2: CP Remove -->
+      <rect x="210" y="45" width="110" height="56" rx="4" fill="#141d30" stroke="#38b2ac" stroke-width="1"/>
+      <text x="265" y="72" text-anchor="middle" font-size="9" fill="#38b2ac">CP / ZP</text>
+      <text x="265" y="85" text-anchor="middle" font-size="9" fill="#a8b4cc">REMOVE</text>
+      <text x="265" y="97" text-anchor="middle" font-size="7.5" fill="#6b7a99">guard removal</text>
+
+      <!-- Block 3: Wigner Transform -->
+      <rect x="368" y="45" width="140" height="56" rx="4" fill="#141d30" stroke="#38b2ac" stroke-width="1.5"/>
+      <text x="438" y="69" text-anchor="middle" font-size="9" fill="#38b2ac" font-weight="600">WIGNER Rx</text>
+      <text x="438" y="82" text-anchor="middle" font-size="8" fill="#a8b4cc">Cross-ambiguity fn.</text>
+      <text x="438" y="95" text-anchor="middle" font-size="7.5" fill="#6b7a99">r(t) → Y_TF[n,m]</text>
+
+      <!-- Block 4: SFFT -->
+      <rect x="556" y="45" width="120" height="56" rx="4" fill="#141d30" stroke="#38b2ac" stroke-width="1.5"/>
+      <text x="616" y="69" text-anchor="middle" font-size="9" fill="#38b2ac" font-weight="600">SFFT</text>
+      <text x="616" y="82" text-anchor="middle" font-size="8" fill="#a8b4cc">2D Symplectic</text>
+      <text x="616" y="95" text-anchor="middle" font-size="7.5" fill="#6b7a99">TF → DD plane</text>
+
+      <!-- Block 5: DD Equalizer -->
+      <rect x="724" y="45" width="120" height="56" rx="4" fill="#141d30" stroke="#38b2ac" stroke-width="1.5"/>
+      <text x="784" y="69" text-anchor="middle" font-size="9" fill="#38b2ac" font-weight="600">DD EQUALIZER</text>
+      <text x="784" y="82" text-anchor="middle" font-size="8" fill="#a8b4cc">MRC / MMSE / MP</text>
+      <text x="784" y="95" text-anchor="middle" font-size="7.5" fill="#6b7a99">recover X̂[k,l]</text>
+
+      <!-- Arrows -->
+      <line x1="162" y1="73" x2="208" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow2)"/>
+      <line x1="320" y1="73" x2="366" y2="73" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrow2)"/>
+      <line x1="508" y1="73" x2="554" y2="73" stroke="#38b2ac" stroke-width="1.5" marker-end="url(#arrowT)"/>
+      <line x1="676" y1="73" x2="722" y2="73" stroke="#38b2ac" stroke-width="1.5" marker-end="url(#arrowT)"/>
+
+      <!-- Labels -->
+      <text x="189" y="140" text-anchor="middle" font-size="7.5" fill="#6b7a99">r(t)</text>
+      <line x1="189" y1="101" x2="189" y2="130" stroke="#6b7a99" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="344" y="140" text-anchor="middle" font-size="7.5" fill="#6b7a99">r_cp(t)</text>
+      <line x1="344" y1="101" x2="344" y2="130" stroke="#6b7a99" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="533" y="140" text-anchor="middle" font-size="7.5" fill="#38b2ac">Y_TF[n,m]</text>
+      <line x1="533" y1="101" x2="533" y2="130" stroke="#38b2ac" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <text x="700" y="140" text-anchor="middle" font-size="7.5" fill="#38b2ac">Y[k,l]</text>
+      <line x1="700" y1="101" x2="700" y2="130" stroke="#38b2ac" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+      <!-- Legend -->
+      <rect x="10" y="165" width="10" height="10" fill="none" stroke="#38b2ac" stroke-width="1.5"/>
+      <text x="25" y="174" font-size="8" fill="#38b2ac">OTFS-specific blocks</text>
+      <rect x="155" y="165" width="10" height="10" fill="none" stroke="#6b7a99" stroke-width="1"/>
+      <text x="170" y="174" font-size="8" fill="#6b7a99">Standard RF chain</text>
+    </svg>
+    <div class="diagram-caption">Fig 2 — OTFS Receiver Block Diagram</div>
+  </div>
+
+  <ul class="step-list">
+    <li><span class="step-num">1</span><div><strong>RF Downconversion / ADC:</strong> The received RF signal is downconverted to baseband and digitized. This is the standard front-end, identical to OFDM receivers.</div></li>
+    <li><span class="step-num">2</span><div><strong>CP/ZP Removal:</strong> The guard interval is stripped, yielding the received block <code>r(t)</code> in the time domain.</div></li>
+    <li><span class="step-num">3</span><div><strong>Wigner Transform (Cross-Ambiguity Function):</strong> The receive pulse <code>g_rx(t)</code> is cross-correlated with <code>r(t)</code> to extract the time-frequency representation <code>Y_TF[n,m]</code>. This is the matched-filter step and the dual of the Heisenberg transform at the transmitter.</div></li>
+    <li><span class="step-num">4</span><div><strong>SFFT:</strong> The 2-D Symplectic Fourier Transform maps <code>Y_TF[n,m]</code> back to the delay-Doppler domain to obtain <code>Y[k,l]</code>, which contains the transmitted symbols convolved with the channel's DD impulse response.</div></li>
+    <li><span class="step-num">5</span><div><strong>DD Domain Equalization:</strong> Since the channel is a sparse 2-D convolution in the DD domain, equalization is performed there. Common algorithms include MMSE, Message Passing (MP), and iterative turbo equalization.</div></li>
+  </ul>
+
+  <div class="callout teal">
+    <div class="callout-title">Rectangular vs Ideal Pulses</div>
+    <p>Using <strong>rectangular pulses</strong> (practically implementable) leads to the CP-OTFS or OFDM-based implementation, where the ISFFT/SFFT reduce to an outer 2-D DFT around the conventional OFDM IFFT/FFT. Using <strong>ideal bi-orthogonal pulses</strong> achieves the theoretically clean input-output relationship but is physically non-realizable — making CP-OTFS the dominant implementation choice.</p>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3 · IMPLEMENTATION
+═══════════════════════════════════════════ -->
+<section id="s-impl">
+  <div class="section-label">03 · Implementation</div>
+  <h2>Implementation <span class="accent">Details</span></h2>
+
+  <p>OTFS can be implemented in two architecturally distinct ways — as a standalone waveform or as a precoding layer on top of OFDM — making it highly backward-compatible with existing 5G NR infrastructure.</p>
+
+  <div class="two-col">
+    <div class="card gold-card">
+      <div class="card-icon">⊞</div>
+      <h4>Standalone OTFS</h4>
+      <p>The full Heisenberg/Wigner pipeline with a custom pulse shaping filter. Achieves maximum diversity but requires dedicated hardware, particularly for non-rectangular pulses. Research-grade hardware platforms (e.g., NI USRP, Xilinx RFSoC) are commonly used.</p>
+    </div>
+    <div class="card gold-card">
+      <div class="card-icon">≋</div>
+      <h4>CP-OTFS (OFDM-based)</h4>
+      <p>An ISFFT precoder added before the standard OFDM IFFT, and an SFFT post-processor after the FFT at the receiver. Fully compatible with 4G/5G NR OFDM hardware. The most practical and widely studied form.</p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">CP-OTFS: OFDM-Compatible Implementation</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 860 160" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono',monospace">
+      <defs>
+        <marker id="arrowC" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#6b7a99"/>
+        </marker>
+        <marker id="arrowGC" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#d4a853"/>
+        </marker>
+      </defs>
+
+      <text x="430" y="18" text-anchor="middle" font-size="10" fill="#6b7a99" letter-spacing="2">CP-OTFS: OFDM-COMPATIBLE IMPLEMENTATION</text>
+
+      <!-- TX side -->
+      <rect x="5" y="35" width="90" height="46" rx="3" fill="#0f1525" stroke="#6b7a99" stroke-width="1"/>
+      <text x="50" y="56" text-anchor="middle" font-size="9" fill="#dde3f0">Bit</text>
+      <text x="50" y="68" text-anchor="middle" font-size="9" fill="#dde3f0">Source</text>
+      <text x="50" y="79" text-anchor="middle" font-size="7.5" fill="#6b7a99">NM bits/frame</text>
+
+      <rect x="115" y="35" width="100" height="46" rx="3" fill="#0f1525" stroke="#d4a853" stroke-width="1.5"/>
+      <text x="165" y="55" text-anchor="middle" font-size="9" fill="#d4a853" font-weight="600">ISFFT</text>
+      <text x="165" y="68" text-anchor="middle" font-size="7.5" fill="#a8b4cc">N-pt DFT (col)</text>
+      <text x="165" y="79" text-anchor="middle" font-size="7.5" fill="#6b7a99">+ M-pt IDFT (row)</text>
+
+      <rect x="235" y="35" width="100" height="46" rx="3" fill="#0f1525" stroke="#6b7a99" stroke-width="1"/>
+      <text x="285" y="62" text-anchor="middle" font-size="9" fill="#dde3f0">S/P → IFFT</text>
+      <text x="285" y="75" text-anchor="middle" font-size="7.5" fill="#6b7a99">M-point IFFT</text>
+
+      <rect x="355" y="35" width="80" height="46" rx="3" fill="#0f1525" stroke="#38b2ac" stroke-width="1"/>
+      <text x="395" y="62" text-anchor="middle" font-size="9" fill="#38b2ac">CP Add</text>
+      <text x="395" y="75" text-anchor="middle" font-size="7.5" fill="#6b7a99">+ P/S</text>
+
+      <!-- Channel box -->
+      <rect x="455" y="30" width="80" height="56" rx="3" fill="#0a0e17" stroke="#6b7a99" stroke-width="0.8" stroke-dasharray="4,2"/>
+      <text x="495" y="53" text-anchor="middle" font-size="9" fill="#6b7a99">CHANNEL</text>
+      <text x="495" y="66" text-anchor="middle" font-size="7.5" fill="#6b7a99">h(τ,ν)</text>
+      <text x="495" y="78" text-anchor="middle" font-size="7.5" fill="#6b7a99">+ AWGN</text>
+
+      <!-- RX side -->
+      <rect x="555" y="35" width="80" height="46" rx="3" fill="#0f1525" stroke="#38b2ac" stroke-width="1"/>
+      <text x="595" y="62" text-anchor="middle" font-size="9" fill="#38b2ac">CP Remove</text>
+      <text x="595" y="75" text-anchor="middle" font-size="7.5" fill="#6b7a99">S/P</text>
+
+      <rect x="655" y="35" width="90" height="46" rx="3" fill="#0f1525" stroke="#6b7a99" stroke-width="1"/>
+      <text x="700" y="62" text-anchor="middle" font-size="9" fill="#dde3f0">FFT → P/S</text>
+      <text x="700" y="75" text-anchor="middle" font-size="7.5" fill="#6b7a99">M-point FFT</text>
+
+      <rect x="765" y="35" width="90" height="46" rx="3" fill="#0f1525" stroke="#d4a853" stroke-width="1.5"/>
+      <text x="810" y="55" text-anchor="middle" font-size="9" fill="#d4a853" font-weight="600">SFFT</text>
+      <text x="810" y="68" text-anchor="middle" font-size="7.5" fill="#a8b4cc">N-pt IDFT (col)</text>
+      <text x="810" y="79" text-anchor="middle" font-size="7.5" fill="#6b7a99">+ M-pt DFT (row)</text>
+
+      <!-- Arrows -->
+      <line x1="95"  y1="58" x2="113" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+      <line x1="215" y1="58" x2="233" y2="58" stroke="#d4a853" stroke-width="1.5" marker-end="url(#arrowGC)"/>
+      <line x1="335" y1="58" x2="353" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+      <line x1="435" y1="58" x2="453" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+      <line x1="535" y1="58" x2="553" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+      <line x1="635" y1="58" x2="653" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+      <line x1="745" y1="58" x2="763" y2="58" stroke="#6b7a99" stroke-width="1" marker-end="url(#arrowC)"/>
+
+      <!-- Labels -->
+      <text x="430" y="115" text-anchor="middle" font-size="8" fill="#d4a853">← OTFS blocks add only DFT/IDFT pre/post-processing around existing OFDM chain →</text>
+      <text x="430" y="130" text-anchor="middle" font-size="7.5" fill="#6b7a99">Backward-compatible with 5G NR OFDM hardware</text>
+    </svg>
+    <div class="diagram-caption">Fig 3 — CP-OTFS: OFDM-Compatible Implementation Flow</div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">Equalization in the DD Domain</h3>
+
+  <p>Equalization is the most computationally intensive part of OTFS reception. Three main approaches exist:</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>MMSE Equalizer</h4>
+      <p>Minimum Mean Square Error linear equalizer. Uses knowledge of <code>H[k,l]</code> to jointly equalize in the DD domain. Complexity is <code>O((NM)³)</code> without structure exploitation but can be reduced using the banded or circulant structure of the channel matrix.</p>
+    </div>
+    <div class="card">
+      <h4>Message Passing (MP)</h4>
+      <p>Iterative belief propagation on the factor graph of the DD channel. Exploits channel sparsity — if the channel has <em>P</em> paths, the graph is very sparse, reducing complexity to <code>O(P·NM)</code> per iteration. Widely used in literature.</p>
+    </div>
+    <div class="card">
+      <h4>Turbo / Iterative</h4>
+      <p>Joint equalization-decoding that passes soft information between the equalizer and channel decoder iteratively. Achieves near-ML performance in high-Doppler environments by leveraging the coding gain alongside DD-domain equalization.</p>
+    </div>
+    <div class="card">
+      <h4>DNN / Learning-based</h4>
+      <p>Deep neural networks trained offline to approximate optimal MMSE/MAP equalization. ResNet and LSTM architectures have been proposed. Handles fractional Doppler and non-ideal pulse shapes without explicit channel modeling.</p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">OTFS vs OFDM: Parameter Correspondence</h3>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>OFDM</th>
+        <th>OTFS</th>
+        <th>Relation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Modulation plane</td>
+        <td>Time-Frequency</td>
+        <td>Delay-Doppler</td>
+        <td>2D-DFT related</td>
+      </tr>
+      <tr>
+        <td>Subcarriers</td>
+        <td>M per OFDM symbol</td>
+        <td>M delay bins</td>
+        <td>Same M-point FFT</td>
+      </tr>
+      <tr>
+        <td>OFDM symbols per frame</td>
+        <td>N</td>
+        <td>N Doppler bins</td>
+        <td>Outer N-DFT added</td>
+      </tr>
+      <tr>
+        <td>Guard interval</td>
+        <td>CP per symbol</td>
+        <td>Single CP/ZP per frame</td>
+        <td><span class="badge badge-gold">Efficiency gain</span></td>
+      </tr>
+      <tr>
+        <td>Channel estimation</td>
+        <td>Pilot per coherence time</td>
+        <td>Few DD pilots</td>
+        <td><span class="badge badge-gold">Sparse channel</span></td>
+      </tr>
+      <tr>
+        <td>Doppler robustness</td>
+        <td>Poor (ICI)</td>
+        <td>Excellent</td>
+        <td><span class="badge badge-teal">Key advantage</span></td>
+      </tr>
+      <tr>
+        <td>PAPR</td>
+        <td>High (~12 dB)</td>
+        <td>Similar to OFDM</td>
+        <td><span class="badge badge-red">Limitation</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 1.8rem 0 0.8rem; font-size:1.2rem;">Channel Estimation in OTFS</h3>
+
+  <p>Channel estimation exploits the sparse, stable nature of the DD channel. A single impulse pilot placed at a known DD grid point <code>(k_p, l_p)</code> with sufficient guard space allows estimation of all <em>P</em> path delays and Dopplers from its echo in the received DD frame. The guard region must be:</p>
+
+  <div class="eq-box">
+    <div class="eq">
+      l_guard ≥ l_max &nbsp;&nbsp;&nbsp; (delay guard)<br>
+      k_guard ≥ k_max &nbsp;&nbsp;&nbsp; (Doppler guard)
+    </div>
+    <div class="eq-label">Guard requirements for pilot-based DD channel estimation</div>
+  </div>
+
+  <p>where <code>l_max</code> and <code>k_max</code> are the maximum delay and Doppler bins of the channel. This is extremely pilot-efficient compared to OFDM, which needs pilots distributed in both time and frequency due to the time-varying nature of the channel in that domain.</p>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4 · APPLICATIONS
+═══════════════════════════════════════════ -->
+<section id="s-apps">
+  <div class="section-label">04 · Applications</div>
+  <h2>Applications &amp; <span class="accent">Use Cases</span></h2>
+
+  <p>OTFS's high-mobility robustness makes it a candidate waveform across a spectrum of scenarios where OFDM begins to fail — from vehicular networks to satellite links to ISAC systems.</p>
+
+  <div class="app-grid">
+    <div class="app-chip">
+      <div class="app-icon">🚗</div>
+      <div class="app-name">V2X / V2V</div>
+    </div>
+    <div class="app-chip">
+      <div class="app-icon">🛰️</div>
+      <div class="app-name">LEO Satellite</div>
+    </div>
+    <div class="app-chip">
+      <div class="app-icon">✈️</div>
+      <div class="app-name">Aeronautical</div>
+    </div>
+    <div class="app-chip">
+      <div class="app-icon">📡</div>
+      <div class="app-name">ISAC / Radar</div>
+    </div>
+    <div class="app-chip">
+      <div class="app-icon">🌊</div>
+      <div class="app-name">UAV / mmWave</div>
+    </div>
+    <div class="app-chip">
+      <div class="app-icon">🔬</div>
+      <div class="app-name">6G Research</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:1.5rem;">
+    <div class="card">
+      <h4>Vehicle-to-Everything (V2X)</h4>
+      <p>Highway vehicular communication at 120–250 km/h produces Doppler spreads of 1–5 kHz at sub-6GHz bands. OTFS maintains bit-error-rate performance orders of magnitude better than OFDM in such environments, enabling reliable URLLC for autonomous driving safety messages.</p>
+    </div>
+    <div class="card">
+      <h4>LEO Satellite Broadband</h4>
+      <p>LEO satellites (500–2000 km altitude) orbit at ~7.5 km/s, producing Doppler shifts up to 48 kHz at Ka-band. OTFS handles this extreme mobility without per-subcarrier compensation loops required by OFDM, making it attractive for Starlink-class broadband access.</p>
+    </div>
+    <div class="card">
+      <h4>Integrated Sensing &amp; Communication (ISAC)</h4>
+      <p>OTFS is naturally suited to ISAC/JCAS because the delay-Doppler frame directly encodes target range and velocity. By correlating the received signal with the transmitted OTFS frame, range-velocity maps can be estimated while simultaneously communicating — with no dedicated radar waveform needed.</p>
+    </div>
+    <div class="card">
+      <h4>High-Speed Rail (HSR)</h4>
+      <p>Modern high-speed trains reach 350+ km/h, causing rapid time variation that severely degrades OFDM in the 2.6 GHz TD-LTE/5G NR bands. OTFS provides a stable, high-throughput link in these scenarios with simpler channel tracking requirements.</p>
+    </div>
+    <div class="card">
+      <h4>mmWave &amp; THz Communications</h4>
+      <p>At mmWave (24–100 GHz), even pedestrian mobility (5 km/h) produces significant normalized Doppler. OTFS coupled with massive MIMO beamforming resolves mobility-induced beam misalignment more gracefully than OFDM, enabling robust 5G/6G mmWave links for mobile users.</p>
+    </div>
+    <div class="card">
+      <h4>Underwater Acoustic (UWA)</h4>
+      <p>Underwater channels exhibit severe spreading — delay spreads of 100s of ms and Doppler spreads due to surface motion. OTFS's DD domain perspective maps perfectly onto this doubly-dispersive UWA channel, and experimental results show significant gains over OFDM-based UWA systems.</p>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5 · PROS & CONS
+═══════════════════════════════════════════ -->
+<section id="s-procon">
+  <div class="section-label">05 · Assessment</div>
+  <h2>Advantages &amp; <span class="accent">Limitations</span></h2>
+
+  <div class="pro-con">
+    <div class="pro-col">
+      <h3>✦ Advantages</h3>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Full Diversity:</strong> Each symbol experiences all delay-Doppler diversity branches of the channel, achieving the maximum diversity order <em>P</em> (number of paths). Compared to OFDM where individual subcarriers see only frequency-flat fading, OTFS delivers dramatically lower BER in multipath-Doppler channels.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Doppler Robustness:</strong> The DD domain naturally captures all Doppler shifts, eliminating inter-carrier interference (ICI) that plagues OFDM at high velocities. No special ICI cancellation or pilot overhead is needed per subcarrier.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Compact Channel Representation:</strong> The DD channel response is sparse (P paths → P spikes) and time-invariant within the frame duration, dramatically simplifying channel estimation and equalization compared to the full N×M time-varying matrix in OFDM.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Pilot Efficiency:</strong> A single DD pilot with guards suffices for full channel estimation, regardless of frame size. OFDM requires a 2D pilot grid scaled with the coherence bandwidth and coherence time.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>ISAC Synergy:</strong> The delay-Doppler frame is a native range-velocity map, enabling dual-function waveforms with no extra overhead. This is a major advantage for 6G ISAC systems.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>OFDM Compatibility:</strong> CP-OTFS adds only a 2-D DFT precoder/post-processor around existing OFDM hardware, enabling evolutionary (not revolutionary) deployment in 5G NR networks.</div>
+      </div>
+    </div>
+
+    <div class="con-col">
+      <h3>✦ Limitations</h3>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Receiver Complexity:</strong> Full MMSE equalization in the DD domain has cubic complexity <em>O((NM)³)</em> without structural exploitation. While MP reduces this, complexity is still higher than OFDM's per-subcarrier one-tap equalizer, especially for large frame sizes.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Fractional Doppler:</strong> When a target's Doppler shift does not fall on an exact DD grid point, energy leaks into neighboring bins. This "fractional Doppler" problem causes inter-symbol interference and degrades performance, requiring windowing or oversampling in the Doppler dimension.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>High PAPR:</strong> Like OFDM, OTFS waveforms exhibit high Peak-to-Average Power Ratio (~10–12 dB), requiring power-backed-off or linearized power amplifiers, increasing hardware cost and reducing power efficiency at the transmitter.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Latency:</strong> OTFS spreads each symbol across the entire N×M frame in both time and frequency. This full spreading means the receiver must collect an entire frame before any symbol can be decoded, imposing a minimum latency of one full OTFS frame duration.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Non-Rectangular Pulse Complexity:</strong> Theoretically optimal bi-orthogonal pulse shaping filters are non-realizable (require infinite support). Practical rectangular pulses introduce interference in the DD domain that must be carefully managed.</div>
+      </div>
+      <div class="pro-con-item">
+        <div class="dot"></div>
+        <div><strong>Standardization Gap:</strong> As of 2025, OTFS has not been incorporated into 3GPP 5G NR standards (Rel-17/18). Practical deployment awaits PHY-layer standardization, ecosystem maturation, and demonstration at scale — leaving OFDM dominant in deployed networks.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; color:var(--text); margin: 2rem 0 1rem; font-size:1.2rem;">OTFS vs Competing Waveforms</h3>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>Waveform</th>
+        <th>Doppler Robustness</th>
+        <th>Spectral Efficiency</th>
+        <th>Equalization</th>
+        <th>ISAC Fit</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OFDM</td>
+        <td><span class="badge badge-red">Poor</span></td>
+        <td><span class="badge badge-teal">High</span></td>
+        <td><span class="badge badge-teal">Simple (1-tap)</span></td>
+        <td><span class="badge badge-red">Limited</span></td>
+        <td><span class="badge badge-teal">Deployed (5G)</span></td>
+      </tr>
+      <tr>
+        <td>OTFS</td>
+        <td><span class="badge badge-gold">Excellent</span></td>
+        <td><span class="badge badge-gold">High</span></td>
+        <td><span class="badge badge-red">Complex (2D)</span></td>
+        <td><span class="badge badge-gold">Native</span></td>
+        <td><span class="badge badge-red">Research / Pre-standard</span></td>
+      </tr>
+      <tr>
+        <td>OCDM</td>
+        <td><span class="badge badge-teal">Good</span></td>
+        <td><span class="badge badge-gold">High</span></td>
+        <td><span class="badge badge-teal">Moderate</span></td>
+        <td><span class="badge badge-red">Limited</span></td>
+        <td><span class="badge badge-red">Research</span></td>
+      </tr>
+      <tr>
+        <td>FBMC/OQAM</td>
+        <td><span class="badge badge-red">Poor</span></td>
+        <td><span class="badge badge-teal">High</span></td>
+        <td><span class="badge badge-teal">Moderate</span></td>
+        <td><span class="badge badge-red">Poor</span></td>
+        <td><span class="badge badge-red">Research</span></td>
+      </tr>
+      <tr>
+        <td>ODDM</td>
+        <td><span class="badge badge-gold">Excellent</span></td>
+        <td><span class="badge badge-gold">High</span></td>
+        <td><span class="badge badge-gold">Structured</span></td>
+        <td><span class="badge badge-gold">Excellent</span></td>
+        <td><span class="badge badge-red">Emerging</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout teal" style="margin-top:2rem;">
+    <div class="callout-title">Research Frontier (2024–2025)</div>
+    <p>Active research directions include: <strong>OTFS-NOMA</strong> (combining DD multiplexing with power-domain NOMA), <strong>RIS-assisted OTFS</strong> for controllable channel paths, <strong>OTFS with massive MIMO</strong> for spatial-DD joint processing, and <strong>ODDM (Orthogonal Delay-Doppler Modulation)</strong> — a cousin waveform using delay-Doppler domain OFDM with additional orthogonality guarantees under ideal pulse conditions.</p>
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  OTFS Modulation — Technical Reference &nbsp;·&nbsp;
+  Hadani et al. (2017), Raviteja et al. (2018/2019) &nbsp;·&nbsp;
+  Compiled for ECE Graduate Study
+</footer>
+
+<script>
+  // ── INTERSECTION OBSERVER for section animations ──
+  const sections = document.querySelectorAll('section');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  sections.forEach(s => obs.observe(s));
+
+  // ── SIDEBAR NAV ──
+  const dots = document.querySelectorAll('.nav-dot');
+  const targets = ['hero','s-concept','s-txrx','s-impl','s-apps','s-procon'];
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      document.getElementById(targets[i]).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  const allSections = targets.map(id => document.getElementById(id));
+  const navObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = allSections.indexOf(e.target);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+    });
+  }, { threshold: 0.4 });
+
+  allSections.forEach(s => s && navObs.observe(s));
+</script>
+</body>
+</html>
