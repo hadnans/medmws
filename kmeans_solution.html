@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Means Clustering — Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #faf8f4;
+  --ink:      #1c1a17;
+  --muted:    #7a7469;
+  --rule:     #e0dbd0;
+  --c1:       #b84c3a;   /* cluster 1 red */
+  --c2:       #2a6496;   /* cluster 2 blue */
+  --c3:       #3d8c5a;   /* cluster 3 green */
+  --c1bg:     #fdf1ef;
+  --c2bg:     #eef5fb;
+  --c3bg:     #eef7f2;
+  --gold:     #c9973a;
+  --panel:    #ffffff;
+  --shadow:   0 2px 12px rgba(0,0,0,0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  padding: 40px 20px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── HEADER ── */
+header {
+  border-bottom: 3px double var(--ink);
+  padding-bottom: 18px;
+  margin-bottom: 32px;
+}
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+header h1 span { color: var(--gold); }
+.meta {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-top: 12px;
+}
+.meta-chip {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 3px 10px;
+  color: var(--muted);
+  background: var(--panel);
+}
+.meta-chip b { color: var(--ink); }
+
+/* ── DATASET + LEGEND ROW ── */
+.top-row {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  margin-bottom: 36px; align-items: flex-start;
+}
+
+/* ── DATASET TABLE ── */
+.ds-block { flex: 0 0 auto; }
+.ds-block h3, .legend-block h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+}
+.ds-tbl {
+  border-collapse: collapse;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.78rem;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--rule);
+}
+.ds-tbl th {
+  background: var(--ink); color: #fff;
+  padding: 6px 14px; text-align: center;
+  font-weight: 600;
+}
+.ds-tbl td {
+  padding: 5px 14px; text-align: center;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 400;
+}
+.ds-tbl tr:last-child td { border-bottom: none; }
+
+/* ── SCATTER PLOT ── */
+.scatter-block { flex: 1 1 340px; }
+.scatter-block h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+}
+canvas#scatter {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+  border-radius: 3px;
+  display: block;
+}
+
+/* ── LEGEND ── */
+.legend-block { flex: 0 0 auto; }
+.legend-items { display: flex; flex-direction: column; gap: 8px; }
+.leg {
+  display: flex; align-items: center; gap: 9px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.78rem;
+}
+.leg-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.leg-star {
+  width: 14px; height: 14px; border-radius: 2px;
+  flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; font-size: 10px;
+}
+
+/* ── SECTION HEADING ── */
+.sec-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem; font-weight: 700;
+  border-left: 4px solid var(--gold);
+  padding-left: 12px;
+  margin: 36px 0 16px;
+  color: var(--ink);
+}
+
+/* ── ITERATION BLOCK ── */
+.iter-block {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.iter-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 18px;
+  background: var(--ink); color: #fff;
+  flex-wrap: wrap;
+}
+.iter-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--gold);
+}
+.iter-centroids {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem; color: #ccc;
+  display: flex; gap: 14px; flex-wrap: wrap;
+}
+.iter-centroids .cc1 { color: #f4a49a; }
+.iter-centroids .cc2 { color: #9ecfee; }
+.iter-centroids .cc3 { color: #96d9b0; }
+
+.iter-table-wrap { overflow-x: auto; }
+table.iter-tbl {
+  width: 100%; border-collapse: collapse;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+}
+table.iter-tbl thead tr { background: #f0ede6; }
+table.iter-tbl th {
+  padding: 7px 10px; text-align: center;
+  color: var(--muted); font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  border-bottom: 2px solid var(--rule);
+  white-space: nowrap;
+}
+table.iter-tbl td {
+  padding: 6px 10px; text-align: center;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 400;
+}
+table.iter-tbl tr:last-child td { border-bottom: none; }
+.td-rec  { font-weight: 600; color: var(--ink); }
+.td-min  { font-weight: 700; }
+.td-c1   { color: var(--c1); background: var(--c1bg); font-weight: 700; }
+.td-c2   { color: var(--c2); background: var(--c2bg); font-weight: 700; }
+.td-c3   { color: var(--c3); background: var(--c3bg); font-weight: 700; }
+.td-chg  { color: var(--gold); font-weight: 700; }
+.td-nochg{ color: var(--muted); }
+.td-min-c1 { color: var(--c1); background: var(--c1bg); font-weight:700; }
+.td-min-c2 { color: var(--c2); background: var(--c2bg); font-weight:700; }
+.td-min-c3 { color: var(--c3); background: var(--c3bg); font-weight:700; }
+
+.iter-footer {
+  padding: 10px 18px;
+  background: #f7f5f0;
+  border-top: 1px solid var(--rule);
+  display: flex; gap: 20px; flex-wrap: wrap;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem; color: var(--muted);
+}
+.iter-footer b { color: var(--ink); }
+.iter-footer .nc1 { color: var(--c1); font-weight:700; }
+.iter-footer .nc2 { color: var(--c2); font-weight:700; }
+.iter-footer .nc3 { color: var(--c3); font-weight:700; }
+
+/* ── ANSWER BOX ── */
+.answer-wrap {
+  margin: 36px 0;
+  background: var(--ink);
+  border-radius: 4px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+}
+.answer-wrap .ans-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: #888; margin-bottom: 10px;
+}
+.answer-wrap .ans-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: #fff; line-height: 1.6;
+}
+.answer-wrap .ans-text .gold { color: var(--gold); font-size: 1.8rem; }
+.answer-wrap .ans-text .nc1  { color: #f4a49a; }
+.answer-wrap .ans-text .nc2  { color: #9ecfee; }
+.answer-wrap .ans-text .nc3  { color: #96d9b0; }
+
+/* ── FINAL SKETCH ── */
+.sketch-wrap {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  align-items: flex-start;
+}
+.sketch-wrap canvas {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.sketch-members {
+  flex: 1 1 200px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.75rem;
+}
+.smem-group { margin-bottom: 14px; }
+.smem-title {
+  font-weight: 700; font-size: 0.78rem;
+  padding: 3px 8px; border-radius: 2px;
+  display: inline-block; margin-bottom: 6px;
+  color: #fff;
+}
+.smem-title.c1 { background: var(--c1); }
+.smem-title.c2 { background: var(--c2); }
+.smem-title.c3 { background: var(--c3); }
+.smem-pts { color: var(--muted); line-height: 2; }
+.smem-pts span { 
+  display: inline-block; background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 2px;
+  padding: 1px 7px; margin: 2px 3px;
+}
+
+/* animations */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.iter-block { animation: fadeUp 0.4s ease both; }
+.iter-block:nth-child(1) { animation-delay: 0.05s; }
+.iter-block:nth-child(2) { animation-delay: 0.15s; }
+.iter-block:nth-child(3) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>K-Means Clustering<br><span>Step-by-Step Solution</span></h1>
+  <div class="meta">
+    <div class="meta-chip">k = <b>3</b></div>
+    <div class="meta-chip">Distance: <b>Euclidean (2 d.p.)</b></div>
+    <div class="meta-chip">Tie-break: <b>Lowest cluster #</b></div>
+    <div class="meta-chip">C1<sub>init</sub> = <b>(5, 2)</b></div>
+    <div class="meta-chip">C2<sub>init</sub> = <b>(5, 3)</b></div>
+    <div class="meta-chip">C3<sub>init</sub> = <b>(5, 4)</b></div>
+  </div>
+</header>
+
+<!-- ═══ TOP ROW: DATASET + INITIAL SCATTER ═══ -->
+<div class="top-row">
+  <div class="ds-block">
+    <h3>Dataset</h3>
+    <table class="ds-tbl">
+      <thead><tr><th>#</th><th>x</th><th>y</th></tr></thead>
+      <tbody id="ds-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="scatter-block">
+    <h3>Final Cluster Sketch</h3>
+    <canvas id="scatter" width="380" height="340"></canvas>
+  </div>
+
+  <div class="legend-block">
+    <h3>Legend</h3>
+    <div class="legend-items">
+      <div class="leg"><div class="leg-dot" style="background:var(--c1)"></div> Cluster 1</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c2)"></div> Cluster 2</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c3)"></div> Cluster 3</div>
+      <div class="leg" style="margin-top:8px">
+        <div class="leg-star" style="background:var(--c1); color:#fff">★</div> Centroid C1
+      </div>
+      <div class="leg">
+        <div class="leg-star" style="background:var(--c2); color:#fff">★</div> Centroid C2
+      </div>
+      <div class="leg">
+        <div class="leg-star" style="background:var(--c3); color:#fff">★</div> Centroid C3
+      </div>
+      <div style="margin-top:14px; font-family:'Source Code Pro',monospace; font-size:0.7rem; color:var(--muted)">
+        Final Members:<br>
+        <div style="margin-top:6px; line-height:2.2">
+          <b style="color:var(--c1)">C1:</b> #3,4,10,12<br>
+          <b style="color:var(--c2)">C2:</b> #2,5,8,9<br>
+          <b style="color:var(--c3)">C3:</b> #1,6,7,11
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ITERATIONS ═══ -->
+<div class="sec-head">Iterations</div>
+<div id="iterations-container"></div>
+
+<!-- ═══ ANSWER ═══ -->
+<div class="answer-wrap">
+  <div class="ans-label">📋 Short Answer</div>
+  <div class="ans-text">
+    <span class="gold">N = 3</span>&nbsp; iterations<br>
+    {&nbsp;3;&nbsp;
+    <span class="nc1">(3, 2)</span>,&nbsp;
+    <span class="nc2">(9, 3)</span>,&nbsp;
+    <span class="nc3">(6, 6)</span>&nbsp;}
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const DATA = [
+  {id:1,  x:7,  y:6},
+  {id:2,  x:10, y:3},
+  {id:3,  x:3,  y:3},
+  {id:4,  x:4,  y:2},
+  {id:5,  x:8,  y:3},
+  {id:6,  x:6,  y:5},
+  {id:7,  x:6,  y:7},
+  {id:8,  x:9,  y:2},
+  {id:9,  x:9,  y:4},
+  {id:10, x:2,  y:2},
+  {id:11, x:5,  y:6},
+  {id:12, x:3,  y:1},
+];
+
+const C1='C1', C2='C2', C3='C3';
+const COLORS = { C1:'#b84c3a', C2:'#2a6496', C3:'#3d8c5a' };
+const BGSTY  = { C1:'var(--c1bg)', C2:'var(--c2bg)', C3:'var(--c3bg)' };
+
+function dist(p, cx, cy){
+  return Math.sqrt((p.x-cx)**2 + (p.y-cy)**2);
+}
+function fmt2(n){ return n.toFixed(2); }
+
+// ═══════════════════════════════════════════════
+//  POPULATE DATASET TABLE
+// ═══════════════════════════════════════════════
+const dsBody = document.getElementById('ds-tbody');
+DATA.forEach(p=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="td-rec">${p.id}</td><td>${p.x}</td><td>${p.y}</td>`;
+  dsBody.appendChild(tr);
+});
+
+// ═══════════════════════════════════════════════
+//  RUN K-MEANS (3 iterations known from manual calc)
+// ═══════════════════════════════════════════════
+const iterations = [];
+let centroids = [{x:5,y:2},{x:5,y:3},{x:5,y:4}];
+let prevClusters = DATA.map(()=>null);
+
+for(let iter=0; iter<10; iter++){
+  const [C1c,C2c,C3c] = centroids;
+  const rows = DATA.map((p, i)=>{
+    const d1 = dist(p, C1c.x, C1c.y);
+    const d2 = dist(p, C2c.x, C2c.y);
+    const d3 = dist(p, C3c.x, C3c.y);
+    // tie-break: lowest cluster
+    let cluster;
+    const mn = Math.min(d1,d2,d3);
+    if(d1===mn) cluster=C1;
+    else if(d2===mn) cluster=C2;
+    else cluster=C3;
+    const changed = prevClusters[i]!==null && prevClusters[i]!==cluster;
+    return {p, d1, d2, d3, cluster, prevCluster:prevClusters[i], changed};
+  });
+
+  // new centroids
+  const groups = {C1:[], C2:[], C3:[]};
+  rows.forEach(r=>groups[r.cluster].push(r.p));
+  const newC = [C1,C2,C3].map(k=>{
+    const pts=groups[k];
+    if(pts.length===0) return null;
+    return {
+      x: Math.round((pts.reduce((s,p)=>s+p.x,0)/pts.length)*100)/100,
+      y: Math.round((pts.reduce((s,p)=>s+p.y,0)/pts.length)*100)/100
+    };
+  });
+
+  iterations.push({
+    num: iter+1,
+    centroids: [...centroids],
+    rows,
+    newCentroids: newC,
+    groups
+  });
+
+  prevClusters = rows.map(r=>r.cluster);
+
+  // check convergence
+  const same = newC.every((c,i)=> c && centroids[i].x===c.x && centroids[i].y===c.y);
+  centroids = newC.map((c,i)=>c||centroids[i]);
+  if(same) break;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER ITERATIONS
+// ═══════════════════════════════════════════════
+const container = document.getElementById('iterations-container');
+
+iterations.forEach((iter, idx)=>{
+  const [C1c,C2c,C3c] = iter.centroids;
+  const [nC1,nC2,nC3] = iter.newCentroids;
+  const isLast = idx===iterations.length-1;
+
+  const block = document.createElement('div');
+  block.className='iter-block';
+
+  // Header
+  block.innerHTML=`
+    <div class="iter-header">
+      <span class="iter-num">Iteration ${iter.num}</span>
+      <div class="iter-centroids">
+        <span class="cc1">C1 = (${C1c.x}, ${C1c.y})</span>
+        <span class="cc2">C2 = (${C2c.x}, ${C2c.y})</span>
+        <span class="cc3">C3 = (${C3c.x}, ${C3c.y})</span>
+      </div>
+      ${isLast ? '<span style="color:#96d9b0;font-family:\'Source Code Pro\',monospace;font-size:0.72rem;margin-left:auto">✓ CONVERGED — no changes</span>' : ''}
+    </div>`;
+
+  // Table
+  const tblWrap = document.createElement('div');
+  tblWrap.className='iter-table-wrap';
+
+  let thead=`<thead><tr>
+    <th>#</th><th>x</th><th>y</th>
+    <th>d(C1)</th><th>d(C2)</th><th>d(C3)</th>
+    <th>Old</th><th>New (Cluster)</th><th>Changed?</th>
+  </tr></thead>`;
+
+  let tbody='<tbody>';
+  iter.rows.forEach(r=>{
+    const {p,d1,d2,d3,cluster,prevCluster,changed} = r;
+    const mn=Math.min(d1,d2,d3);
+    const clsMap={C1:'c1',C2:'c2',C3:'c3'};
+    const minClass = (v,c)=> v===mn ? `td-min-${clsMap[c]}` : '';
+
+    const d1cls = d1===mn && cluster===C1 ? `td-min-c1` : (d1===mn?'td-min':'' );
+    // Highlight the min distance cell for the chosen cluster
+    function dCls(v,c){
+      if(v===mn && c===cluster) return `td-min-${clsMap[c]}`;
+      return '';
+    }
+
+    const oldTxt = prevCluster || '—';
+    const chgTxt = prevCluster===null ? '—' : (changed ? 'Yes' : 'No');
+    const chgCls = changed ? 'td-chg' : 'td-nochg';
+
+    tbody+=`<tr>
+      <td class="td-rec">${p.id}</td>
+      <td>${p.x}</td><td>${p.y}</td>
+      <td class="${dCls(d1,C1)}">${fmt2(d1)}</td>
+      <td class="${dCls(d2,C2)}">${fmt2(d2)}</td>
+      <td class="${dCls(d3,C3)}">${fmt2(d3)}</td>
+      <td class="td-${clsMap[prevCluster]||''}">${oldTxt}</td>
+      <td class="td-${clsMap[cluster]}">${cluster}</td>
+      <td class="${chgCls}">${chgTxt}</td>
+    </tr>`;
+  });
+  tbody+='</tbody>';
+
+  const tbl = document.createElement('table');
+  tbl.className='iter-tbl';
+  tbl.innerHTML=thead+tbody;
+  tblWrap.appendChild(tbl);
+  block.appendChild(tblWrap);
+
+  // Footer: new centroids
+  const footer = document.createElement('div');
+  footer.className='iter-footer';
+
+  const fmtC=(c)=>c?`(${c.x}, ${c.y})`:'—';
+
+  // Members
+  const g=iter.groups;
+  const memberStr=(k)=>g[k].map(p=>`#${p.id}(${p.x},${p.y})`).join(', ');
+
+  footer.innerHTML=`
+    <div>New centroids →
+      <span class="nc1">C1=${fmtC(nC1)}</span>&nbsp;
+      <span class="nc2">C2=${fmtC(nC2)}</span>&nbsp;
+      <span class="nc3">C3=${fmtC(nC3)}</span>
+    </div>
+    <div style="color:var(--muted)">
+      <span class="nc1">C1:</span> ${memberStr(C1)} &nbsp;|&nbsp;
+      <span class="nc2">C2:</span> ${memberStr(C2)} &nbsp;|&nbsp;
+      <span class="nc3">C3:</span> ${memberStr(C3)}
+    </div>`;
+  block.appendChild(footer);
+
+  container.appendChild(block);
+});
+
+// ═══════════════════════════════════════════════
+//  SCATTER PLOT — FINAL STATE
+// ═══════════════════════════════════════════════
+(function drawScatter(){
+  const canvas = document.getElementById('scatter');
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const PAD={top:24,right:24,bottom:40,left:40};
+  const PW=W-PAD.left-PAD.right, PH=H-PAD.top-PAD.bottom;
+
+  // Data range 1..10
+  const xMin=1,xMax=11,yMin=0,yMax=8;
+
+  function toCanvas(x,y){
+    return [
+      PAD.left + (x-xMin)/(xMax-xMin)*PW,
+      PAD.top  + (yMax-y)/(yMax-yMin)*PH
+    ];
+  }
+
+  // Background
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='#ede9e0'; ctx.lineWidth=1;
+  for(let x=1;x<=11;x++){
+    const [cx]=toCanvas(x,0), [,cy1]=toCanvas(x,yMax), [,cy2]=toCanvas(x,yMin);
+    ctx.beginPath(); ctx.moveTo(cx,cy1+PAD.top); ctx.lineTo(cx,cy2); ctx.stroke();
+  }
+  for(let y=0;y<=8;y++){
+    const [cx1]=toCanvas(xMin,y), [cx2]=toCanvas(xMax,y), [,cy]=toCanvas(0,y);
+    ctx.beginPath(); ctx.moveTo(cx1,cy); ctx.lineTo(cx2,cy); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.5;
+  const [ax0,ay0]=toCanvas(xMin,yMin);
+  const [ax1   ]=toCanvas(xMax,yMin);
+  const [   ,ay1]=toCanvas(xMin,yMax);
+  ctx.beginPath(); ctx.moveTo(ax0,ay0); ctx.lineTo(ax1,ay0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax0,ay0); ctx.lineTo(ax0,ay1); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle='#7a7469';
+  ctx.font='11px Lato,sans-serif'; ctx.textAlign='center';
+  for(let x=2;x<=10;x+=2){
+    const [cx,cy]=toCanvas(x,yMin);
+    ctx.fillText(x,cx,cy+16);
+  }
+  ctx.textAlign='right';
+  for(let y=1;y<=7;y+=1){
+    const [cx,cy]=toCanvas(xMin,y);
+    ctx.fillText(y,cx-6,cy+4);
+  }
+
+  // Cluster hulls (simple bounding ellipses per cluster)
+  const lastIter = iterations[iterations.length-1];
+  const finalGroups = lastIter.groups;
+  const finalCentroids = lastIter.newCentroids;
+
+  // Draw convex-ish regions using filled circles around each point
+  ['C1','C2','C3'].forEach((k,i)=>{
+    const c=COLORS[k];
+    ctx.save();
+    ctx.globalAlpha=0.08;
+    finalGroups[k].forEach(p=>{
+      const [cx,cy]=toCanvas(p.x,p.y);
+      const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,32);
+      grad.addColorStop(0,c); grad.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=grad;
+      ctx.beginPath(); ctx.arc(cx,cy,32,0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+  });
+
+  // Draw lines from centroid to members
+  ['C1','C2','C3'].forEach((k,i)=>{
+    const fc=finalCentroids[i];
+    if(!fc) return;
+    const c=COLORS[k];
+    const [ccx,ccy]=toCanvas(fc.x,fc.y);
+    ctx.strokeStyle=c; ctx.lineWidth=0.8; ctx.globalAlpha=0.3;
+    finalGroups[k].forEach(p=>{
+      const [px,py]=toCanvas(p.x,p.y);
+      ctx.beginPath(); ctx.moveTo(ccx,ccy); ctx.lineTo(px,py); ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+  });
+
+  // Data points
+  const finalRows = lastIter.rows;
+  finalRows.forEach(r=>{
+    const {p,cluster}=r;
+    const [cx,cy]=toCanvas(p.x,p.y);
+    const c=COLORS[cluster];
+
+    // shadow
+    ctx.shadowColor='rgba(0,0,0,0.15)'; ctx.shadowBlur=4;
+    ctx.fillStyle=c;
+    ctx.beginPath(); ctx.arc(cx,cy,7,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+
+    // label
+    ctx.fillStyle='#222';
+    ctx.font='bold 9px Source Code Pro, monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff';
+    ctx.fillText(p.id,cx,cy);
+  });
+
+  // Centroids (stars)
+  ['C1','C2','C3'].forEach((k,i)=>{
+    const fc=finalCentroids[i];
+    if(!fc) return;
+    const c=COLORS[k];
+    const [cx,cy]=toCanvas(fc.x,fc.y);
+
+    // draw star
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.2)'; ctx.shadowBlur=6;
+    ctx.translate(cx,cy);
+    ctx.fillStyle=c;
+    const outerR=10, innerR=4.5, spikes=5;
+    ctx.beginPath();
+    for(let j=0;j<spikes*2;j++){
+      const r=j%2===0?outerR:innerR;
+      const a=(j*Math.PI/spikes)-Math.PI/2;
+      j===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle=c;
+    ctx.font='bold 9px Lato,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(`${k}(${fc.x},${fc.y})`,cx,cy+12);
+  });
+
+  // Title
+  ctx.fillStyle='#7a7469';
+  ctx.font='11px Lato,sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('Final Iteration — Converged Clusters',PAD.left,6);
+})();
+</script>
+</body>
+</html>
