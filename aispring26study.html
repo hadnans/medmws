@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Course — Quiz Study Guide | CSE 602 · Ain Shams University</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:        #0d1b2e;
+    --navy-mid:    #142438;
+    --navy-card:   #1a2e46;
+    --navy-hover:  #1f3655;
+    --gold:        #c9a84c;
+    --gold-light:  #e2c46e;
+    --gold-faint:  rgba(201,168,76,0.12);
+    --gold-border: rgba(201,168,76,0.30);
+    --teal:        #3eb8b0;
+    --teal-faint:  rgba(62,184,176,0.15);
+    --red:         #e05c5c;
+    --green:       #4caf7d;
+    --text:        #dce8f5;
+    --text-muted:  #8ca8c4;
+    --border:      rgba(255,255,255,0.06);
+    --radius:      14px;
+    --transition:  0.28s cubic-bezier(.4,0,.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+    font-size: 15.5px;
+  }
+
+  /* ── HEADER ───────────────────────────── */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,27,46,0.96);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 58px;
+  }
+  .site-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.3rem; font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: .3px;
+  }
+  .site-subtitle {
+    font-size: .78rem; color: var(--text-muted);
+    margin-left: 1rem;
+  }
+  .header-left { display: flex; align-items: baseline; gap: 0; }
+
+  nav { display: flex; gap: .25rem; flex-wrap: wrap; justify-content: flex-end; }
+  nav a {
+    font-size: .74rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+    color: var(--text-muted); text-decoration: none;
+    padding: .3rem .65rem; border-radius: 6px;
+    transition: background var(--transition), color var(--transition);
+  }
+  nav a:hover { background: var(--gold-faint); color: var(--gold-light); }
+
+  /* ── HERO ────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1b2e 0%, #0e2240 50%, #0a1e35 100%);
+    padding: 4.5rem 2rem 3.5rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 20%, rgba(62,184,176,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: .72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); border: 1px solid var(--gold-border);
+    padding: .25rem .9rem; border-radius: 20px; margin-bottom: 1.2rem;
+    background: var(--gold-faint);
+  }
+  .hero h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 600;
+    color: var(--text); line-height: 1.2; margin-bottom: .8rem;
+  }
+  .hero h1 span { color: var(--gold-light); }
+  .hero p {
+    color: var(--text-muted); font-size: 1rem; max-width: 580px; margin: 0 auto 2rem;
+  }
+  .hero-stats {
+    display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+    font-size: .8rem; color: var(--text-muted);
+  }
+  .stat strong { display: block; font-size: 1.6rem; font-weight: 700; color: var(--gold); }
+
+  /* ── FILTER BAR ─────────────────────── */
+  .filter-bar {
+    max-width: 1200px; margin: 2rem auto 0; padding: 0 2rem;
+    display: flex; gap: .6rem; flex-wrap: wrap; align-items: center;
+  }
+  .filter-label { font-size: .78rem; color: var(--text-muted); margin-right: .4rem; }
+  .filter-btn {
+    font-size: .75rem; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
+    padding: .35rem .9rem; border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--navy-card);
+    color: var(--text-muted); cursor: pointer;
+    transition: all var(--transition);
+  }
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--gold-border); background: var(--gold-faint); color: var(--gold);
+  }
+
+  /* ── MAIN LAYOUT ─────────────────────── */
+  .main { max-width: 1200px; margin: 2.5rem auto 4rem; padding: 0 2rem; }
+
+  /* ── QUIZ CARD ────────────────────────── */
+  .quiz-card {
+    background: var(--navy-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1.4rem;
+    overflow: hidden;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .quiz-card:hover { border-color: var(--gold-border); }
+  .quiz-card.active { border-color: rgba(201,168,76,0.5); box-shadow: 0 4px 32px rgba(201,168,76,0.08); }
+
+  .quiz-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.1rem 1.5rem; cursor: pointer;
+    user-select: none;
+  }
+  .quiz-header:hover { background: var(--navy-hover); }
+
+  .quiz-num {
+    min-width: 42px; height: 42px;
+    background: var(--gold-faint); border: 1px solid var(--gold-border);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .85rem; font-weight: 600; color: var(--gold);
+  }
+  .quiz-meta { flex: 1; }
+  .quiz-title {
+    font-weight: 600; font-size: 1rem; color: var(--text);
+  }
+  .quiz-date-tag {
+    font-size: .73rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: .6rem; margin-top: .15rem;
+  }
+  .badge {
+    display: inline-block; font-size: .66rem; font-weight: 700; letter-spacing: .5px;
+    text-transform: uppercase; padding: .12rem .5rem; border-radius: 4px;
+  }
+  .badge-search { background: rgba(62,184,176,0.15); color: var(--teal); }
+  .badge-heuristic { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .badge-game { background: rgba(147,51,234,0.2); color: #b57bee; }
+  .badge-ml { background: rgba(224,92,92,0.15); color: #e88; }
+  .badge-csp { background: rgba(76,175,125,0.15); color: var(--green); }
+  .badge-cluster { background: rgba(100,140,220,0.15); color: #8ab4f8; }
+
+  .chevron {
+    color: var(--text-muted); font-size: 1.1rem; transition: transform var(--transition);
+  }
+  .quiz-card.active .chevron { transform: rotate(180deg); }
+
+  /* ── QUIZ BODY ────────────────────────── */
+  .quiz-body {
+    display: none; padding: 0 1.5rem 1.5rem;
+    animation: slideDown .25s ease;
+  }
+  .quiz-card.active .quiz-body { display: block; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    height: 1px; background: var(--border); margin-bottom: 1.4rem;
+  }
+
+  /* sections inside body */
+  .section-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: .6rem; display: flex; align-items: center; gap: .5rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--gold-border); }
+
+  .q-block, .a-block, .exp-block {
+    border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1rem;
+  }
+  .q-block { background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+  .a-block { background: rgba(62,184,176,0.07); border: 1px solid rgba(62,184,176,0.2); }
+  .exp-block { background: rgba(201,168,76,0.06); border: 1px solid var(--gold-border); }
+
+  /* step table */
+  .step-table {
+    width: 100%; border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+    margin: .8rem 0;
+  }
+  .step-table th {
+    background: rgba(201,168,76,0.12); color: var(--gold);
+    padding: .5rem .7rem; text-align: left; border-bottom: 1px solid var(--gold-border);
+    font-size: .72rem; letter-spacing: .5px; text-transform: uppercase;
+  }
+  .step-table td {
+    padding: .42rem .7rem; border-bottom: 1px solid var(--border);
+    color: var(--text-muted); vertical-align: top;
+  }
+  .step-table tr:hover td { background: rgba(255,255,255,0.025); color: var(--text); }
+  .step-table td.highlight { color: var(--teal); font-weight: 600; }
+  .step-table td.goal { color: var(--green); font-weight: 600; }
+  .step-table td.warn { color: var(--gold); }
+
+  /* code / formula */
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    padding: .7rem 1rem; border-radius: 8px;
+    font-size: .82rem; color: var(--gold-light);
+    margin: .6rem 0; overflow-x: auto;
+  }
+
+  /* two-col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: .8rem 0; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .info-box {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 10px; padding: .9rem 1rem;
+  }
+  .info-box h4 { font-size: .78rem; color: var(--gold); margin-bottom: .5rem; font-weight: 600; letter-spacing: .5px; }
+  .info-box p, .info-box li { font-size: .87rem; color: var(--text-muted); }
+  .info-box ul { padding-left: 1.2rem; }
+  .info-box li { margin-bottom: .25rem; }
+
+  /* answer highlight box */
+  .answer-final {
+    background: rgba(76,175,125,0.1); border: 1px solid rgba(76,175,125,0.3);
+    border-radius: 10px; padding: .8rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace; font-size: .88rem; color: var(--green);
+    margin: .8rem 0;
+  }
+  .answer-final span { color: var(--text-muted); font-size: .75rem; display: block; margin-bottom: .2rem; }
+
+  /* key insight pill */
+  .insight {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--gold-border);
+    border-radius: 6px; padding: .3rem .8rem;
+    font-size: .8rem; color: var(--gold); margin: .3rem .25rem .3rem 0;
+  }
+
+  /* grid path display */
+  .maze-grid {
+    display: inline-grid; gap: 2px;
+    font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+    margin: .6rem 0;
+  }
+  .cell {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    font-size: .65rem; font-weight: 600;
+  }
+  .cell-wall  { background: #1a3050; color: #4a6480; }
+  .cell-open  { background: rgba(255,255,255,0.04); color: var(--text-muted); }
+  .cell-start { background: rgba(62,184,176,0.3); color: var(--teal); border: 1px solid var(--teal); }
+  .cell-goal  { background: rgba(76,175,125,0.3); color: var(--green); border: 1px solid var(--green); }
+  .cell-path  { background: rgba(201,168,76,0.25); color: var(--gold); }
+
+  /* ttt grid */
+  .ttt { display: inline-grid; grid-template-columns: repeat(3, 40px); gap: 3px; margin: .4rem; }
+  .ttt-cell {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 1rem; font-weight: 700;
+  }
+  .ttt-cell.x { color: var(--teal); }
+  .ttt-cell.o { color: var(--red); }
+  .ttt-cell.empty { color: var(--text-muted); font-size: .7rem; }
+
+  /* ── FOOTER ─────────────────────────── */
+  footer {
+    text-align: center; padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: .78rem; color: var(--text-muted);
+  }
+  footer span { color: var(--gold); }
+
+  /* scroll top */
+  .scroll-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--gold-faint); border: 1px solid var(--gold-border);
+    color: var(--gold); font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background var(--transition);
+    z-index: 200;
+  }
+  .scroll-top:hover { background: var(--gold); color: var(--navy); }
+
+  p { margin-bottom: .5rem; }
+  strong { color: var(--text); }
+
+  .node-row {
+    display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; margin: .3rem 0;
+  }
+  .node {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 30px; height: 30px; padding: 0 .6rem;
+    border-radius: 50%; border: 2px solid var(--teal);
+    background: var(--teal-faint); color: var(--teal);
+    font-weight: 700; font-size: .82rem;
+  }
+  .node.goal { border-color: var(--green); background: rgba(76,175,125,0.15); color: var(--green); }
+  .node.start { border-color: var(--gold); background: var(--gold-faint); color: var(--gold); }
+  .arrow { color: var(--text-muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="site-title">AI Study Guide</div>
+      <div class="site-subtitle">CSE 602 · Ain Shams University · Spring 2026</div>
+    </div>
+    <nav>
+      <a href="#search">Search</a>
+      <a href="#heuristic">Heuristic</a>
+      <a href="#game">Game</a>
+      <a href="#local">Local</a>
+      <a href="#csp">CSP</a>
+      <a href="#ml">ML</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Prof. Hani Mahdi · Solutions Document</div>
+  <h1>Artificial Intelligence<br><span>Course Quizzes</span></h1>
+  <p>Step-by-step solutions with algorithm explanations for all 18 quizzes — from uninformed search to k-means clustering.</p>
+  <div class="hero-stats">
+    <div class="stat"><strong>18</strong> Quizzes</div>
+    <div class="stat"><strong>6</strong> Topics</div>
+    <div class="stat"><strong>Feb–May</strong> 2026</div>
+  </div>
+</section>
+
+<!-- FILTER -->
+<div class="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+  <button class="filter-btn" onclick="filterCards('search', this)">🔍 Search</button>
+  <button class="filter-btn" onclick="filterCards('heuristic', this)">🎯 Heuristic</button>
+  <button class="filter-btn" onclick="filterCards('game', this)">🎮 Game</button>
+  <button class="filter-btn" onclick="filterCards('local', this)">🏔 Local Search</button>
+  <button class="filter-btn" onclick="filterCards('csp', this)">🧩 CSP</button>
+  <button class="filter-btn" onclick="filterCards('ml', this)">🤖 ML</button>
+  <button class="filter-btn" onclick="filterCards('cluster', this)">🔵 Clustering</button>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 1 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="search">
+<div class="quiz-card" data-tag="search" id="q1">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#1</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Uninformed Search — Find the Node (Frontier + Explored Set)</div>
+      <div class="quiz-date-tag">21 Feb 2026 <span class="badge badge-search">Uninformed Search</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Given an undirected graph with nodes <strong>A, B, C, D, E, F</strong>, starting from Node A, perform an uninformed search (no strategy / no heuristic) to determine if there is a path to node <strong>H</strong>.</p>
+      <p>The graph edges are: A–B, A–D, B–C, B–E, C–D, C–F, E–F.</p>
+      <p>Maintain a <strong>frontier</strong> and an <strong>explored set</strong>. Show each step in a table.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Uninformed (Blind) Search</strong> explores nodes without any knowledge of where the goal is. It uses a <em>frontier</em> (nodes seen but not yet processed) and an <em>explored set</em> (nodes already processed).</p>
+      <p><strong>Key rule:</strong> When you expand a node, add its unvisited neighbors to the frontier. The order in the frontier determines what gets processed next (here: the frontier is managed informally — think of it like BFS notation but without strict queue ordering).</p>
+      <div class="formula">For each step:
+1. Pick a node from the frontier → "Selected Node"
+2. Check: is it the goal? If yes → done
+3. Add its unvisited neighbors to frontier
+4. Move selected node to Explored set
+5. If frontier is empty and goal not found → goal doesn't exist</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Selected</th><th>Is Goal?</th><th>Explored</th><th>Neighbors</th><th>Frontier</th><th>Empty?</th><th>Comment</th></tr>
+        <tr><td class="highlight">A</td><td>No</td><td>A</td><td>Yes</td><td>B, C, D</td><td>No</td><td>Start. A's neighbors: B, D (and C via B)</td></tr>
+        <tr><td class="highlight">D</td><td>No</td><td>A, D</td><td>Yes</td><td>B, C</td><td>No</td><td>Next: D (from frontier)</td></tr>
+        <tr><td class="highlight">C</td><td>No</td><td>A, D, C</td><td>Yes</td><td>B, E, F</td><td>No</td><td>C's new neighbors: E, F</td></tr>
+        <tr><td class="highlight">B</td><td>No</td><td>A, D, C, B</td><td>Yes</td><td>E, F</td><td>No</td><td>B's unvisited: already in frontier</td></tr>
+        <tr><td class="highlight">E</td><td>No</td><td>A, D, C, B, E</td><td>Yes</td><td>F</td><td>No</td><td>E's unvisited: F already in frontier</td></tr>
+        <tr><td class="highlight">F</td><td>No</td><td>A, D, C, B, E, F</td><td>Yes</td><td>—</td><td><span style="color:var(--red)">Yes</span></td><td>All nodes explored. H never seen.</td></tr>
+      </table>
+      <div class="answer-final"><span>Final Answer</span>"Node H doesn't exist" — H is not reachable from A in this graph.</div>
+    </div>
+
+    <div class="section-label">Key Insights</div>
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Why "Node H doesn't exist"?</h4>
+        <ul>
+          <li>The frontier became empty before H was ever encountered</li>
+          <li>An empty frontier means we've exhausted all reachable nodes</li>
+          <li>H is simply not in the graph — the search proves this</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Frontier vs. Explored</h4>
+        <ul>
+          <li><strong>Frontier:</strong> Nodes discovered, not yet expanded</li>
+          <li><strong>Explored:</strong> Nodes fully processed (all neighbors seen)</li>
+          <li>Together they prevent infinite loops in cyclic graphs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 2 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="search" id="q2">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#2</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Depth-First Search — Stack-Based Approach</div>
+      <div class="quiz-date-tag">24 Feb 2026 <span class="badge badge-search">DFS</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Undirected graph: A–B, A–D, B–C, B–E, D–E, D–G, E–F, G–H. Start at <strong>A</strong>, Goal at <strong>F</strong>.</p>
+      <p>Use a <strong>stack-based DFS</strong>. When multiple unvisited neighbors exist, push them in <strong>alphabetical order</strong> (so reverse-alphabetical is processed first).</p>
+      <p>Show the stack state, explored nodes, and final path.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Depth-First Search (DFS)</strong> explores as deep as possible along each branch before backtracking. A <strong>stack</strong> implements this naturally (LIFO = Last In, First Out).</p>
+      <div class="formula">Stack notation: [top → ... → bottom]
+Each entry is "Node:ParentNode" to track the path
+
+When expanding node X with neighbors N1, N2, N3 (alphabetical):
+→ Push N3, N2, N1 (reverse alpha) so N1 pops first</div>
+      <p>The path is reconstructed by following parent pointers back from goal to start.</p>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Selected</th><th>Goal?</th><th>Explored</th><th>Has Neighbors?</th><th>Stack (top→bottom)</th><th>Empty?</th><th>Comment</th></tr>
+        <tr><td class="highlight">A</td><td>No</td><td>A</td><td>Yes</td><td>[B:A, D:A]</td><td>No</td><td>A's neighbors: B, D → push D then B (B on top)</td></tr>
+        <tr><td class="highlight">D</td><td>No</td><td>A, D</td><td>Yes</td><td>[B:A, E:D, G:D]</td><td>No</td><td>D's unvisited: E, G → push G then E</td></tr>
+        <tr><td class="highlight">G</td><td>No</td><td>A, D, G</td><td>Yes</td><td>[B:A, E:D, H:G]</td><td>No</td><td>G's unvisited: H → push H</td></tr>
+        <tr><td class="highlight">H</td><td>No</td><td>A, D, G, H</td><td class="warn">No</td><td>[B:A, E:D]</td><td>No</td><td>H has no unvisited neighbors. Dead end.</td></tr>
+        <tr><td class="highlight">E</td><td>No</td><td>A, D, G, H, E</td><td>Yes</td><td>[B:A, B:E, F:E]</td><td>No</td><td>E's unvisited: B, F → push F then B</td></tr>
+        <tr><td class="highlight">F</td><td class="goal">Yes!</td><td>A, D, G, H, E, F</td><td>—</td><td>[B:A, B:E]</td><td>No</td><td>🎯 Goal found!</td></tr>
+      </table>
+      <p style="margin-top:.8rem;font-size:.85rem;color:var(--text-muted)"><strong>Path reconstruction:</strong> F←E:D, D←A → follow parent chain: F → E → D → A</p>
+      <div class="answer-final"><span>Final Answer (path)</span>{ A, D, E, F }</div>
+    </div>
+
+    <div class="section-label">Key Insights</div>
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Stack vs. Queue</h4>
+        <ul>
+          <li><strong>Stack (LIFO):</strong> DFS — goes deep first</li>
+          <li><strong>Queue (FIFO):</strong> BFS — explores level by level</li>
+          <li>Same exploration code, different data structure</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Why push in reverse alphabetical?</h4>
+        <ul>
+          <li>We want A processed before B, B before C, etc.</li>
+          <li>Stack is LIFO, so push Z before A to get A on top</li>
+          <li>Here: push D before B → B pops first</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 3 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="search" id="q3">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#3</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Breadth-First Search — Queue-Based Approach</div>
+      <div class="quiz-date-tag">1 Mar 2026 <span class="badge badge-search">BFS</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Same graph as Quiz 2 (A–B, A–D, B–C, B–E, D–E, D–G, E–F, G–H). Start at <strong>A</strong>, Goal at <strong>F</strong>.</p>
+      <p>Use <strong>BFS with a queue</strong>. Enqueue unvisited neighbors in <strong>alphabetical order</strong>. Find the shortest path.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Breadth-First Search (BFS)</strong> explores all nodes at depth d before any node at depth d+1. It guarantees the <em>shortest path</em> (fewest edges) in unweighted graphs.</p>
+      <div class="formula">Queue notation: [front → ... → back]  (FIFO)
+Each entry "Node:Parent" to reconstruct path later
+
+Enqueue neighbors in alphabetical order
+→ A's neighbors B, D → enqueue B first, then D</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Selected</th><th>Goal?</th><th>Explored</th><th>Neighbors?</th><th>Queue (front→back)</th><th>Comment</th></tr>
+        <tr><td class="highlight">A</td><td>No</td><td>A</td><td>Yes</td><td>[B:A, D:A]</td><td>Enqueue B, D</td></tr>
+        <tr><td class="highlight">B</td><td>No</td><td>A, B</td><td>Yes</td><td>[D:A, C:B, E:B]</td><td>B's unvisited: C, E</td></tr>
+        <tr><td class="highlight">D</td><td>No</td><td>A, B, D</td><td>Yes</td><td>[C:B, E:B, G:D]</td><td>D's unvisited: G (E already queued)</td></tr>
+        <tr><td class="highlight">C</td><td>No</td><td>A, B, D, C</td><td>Yes</td><td>[E:B, G:D, F:C]</td><td>C's unvisited: F (B,D already explored)</td></tr>
+        <tr><td class="highlight">E</td><td>No</td><td>A,B,D,C,E</td><td>Yes</td><td>[G:D, F:C]</td><td>E's unvisited: F already queued</td></tr>
+        <tr><td class="highlight">G</td><td>No</td><td>A,B,D,C,E,G</td><td>Yes</td><td>[F:C, H:G]</td><td>G's unvisited: H</td></tr>
+        <tr><td class="highlight">F</td><td class="goal">Yes!</td><td>A,B,D,C,E,G,F</td><td>—</td><td>[H:G]</td><td>🎯 Goal found! F's parent: C</td></tr>
+      </table>
+      <p style="margin-top:.8rem;font-size:.85rem;color:var(--text-muted)"><strong>Path reconstruction:</strong> F←C:B, B←A → { A, B, C, F }</p>
+      <div class="answer-final"><span>Final Answer (shortest path)</span>{ A, B, C, F }</div>
+    </div>
+
+    <div class="section-label">BFS vs. DFS Comparison</div>
+    <div class="two-col">
+      <div class="info-box">
+        <h4>BFS Result: { A, B, C, F }</h4>
+        <ul><li>Path length: 3 edges</li><li>Guaranteed shortest (fewest hops)</li><li>Explores level by level</li></ul>
+      </div>
+      <div class="info-box">
+        <h4>DFS Result: { A, D, E, F }</h4>
+        <ul><li>Path length: 3 edges (same here)</li><li>Not guaranteed shortest</li><li>Goes deep before wide</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 4 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="heuristic">
+<div class="quiz-card" data-tag="heuristic" id="q4">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#4</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Greedy Best-First Search — Maze with Manhattan Distance</div>
+      <div class="quiz-date-tag">4 Mar 2026 <span class="badge badge-heuristic">Greedy BFS</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Navigate a maze from Start <strong>S = (b1)</strong> to Goal <strong>G = (e6)</strong> using <strong>Greedy Best-First Search</strong> with Manhattan Distance as the heuristic.</p>
+      <p>At each step, move to the neighbor (L, U, R, D) with the <strong>lowest heuristic value</strong>. Show all neighbor values each step.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Greedy BFS</strong> always picks the node that <em>looks closest to the goal</em>, using a heuristic function h(n). It's like following a compass — fast but can get stuck.</p>
+      <div class="formula">Manhattan Distance:
+h(n) = |col_n - col_G| + |row_n - row_G|
+     = |column - 6| + |row - 6|   (Goal is at e6)
+
+Direction priority on tie: L > U > R > D (Left first)</div>
+      <p><strong>Important:</strong> Greedy BFS does NOT guarantee the optimal path — it can make local detours.</p>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>From</th><th>Cell</th><th>L</th><th>U</th><th>R</th><th>D</th><th>Direction</th><th>Value</th></tr>
+        <tr><td>—</td><td>S(b1)</td><td>—</td><td>—</td><td>9</td><td>—</td><td class="highlight">R</td><td>9</td></tr>
+        <tr><td>S</td><td>b1→c1</td><td>—</td><td>—</td><td>8</td><td>—</td><td class="highlight">R</td><td>8</td></tr>
+        <tr><td>b1</td><td>c1→d1</td><td>—</td><td>—</td><td>7</td><td>—</td><td class="highlight">R</td><td>7</td></tr>
+        <tr><td>c1</td><td>d1→e1</td><td>—</td><td>5</td><td>—</td><td>—</td><td class="highlight">U</td><td>5</td></tr>
+        <tr><td>d1</td><td>e1→e2</td><td>—</td><td>4</td><td>—</td><td>—</td><td class="highlight">U</td><td>4</td></tr>
+        <tr><td>e1</td><td>e2→e3</td><td>—</td><td>3</td><td>—</td><td>—</td><td class="highlight">U</td><td>3</td></tr>
+        <tr><td>e2</td><td>e3→e4</td><td>4</td><td>—</td><td class="warn">2</td><td>—</td><td class="highlight">R</td><td>2</td></tr>
+        <tr><td>e3</td><td>e4→f4</td><td>—</td><td>—</td><td>3</td><td>—</td><td class="highlight">R</td><td>3</td></tr>
+        <tr><td>e4</td><td>f4→g4</td><td>—</td><td>—</td><td>4</td><td>—</td><td class="highlight">R</td><td>4</td></tr>
+        <tr><td>f4</td><td>g4→g3</td><td>—</td><td>—</td><td>—</td><td>5</td><td class="highlight">D</td><td>5</td></tr>
+        <tr><td>g4</td><td>g3→…backtrack</td><td colspan="5">Various recoveries and detours…</td><td></td></tr>
+        <tr><td>…</td><td>→a4→a5→a6→b6→c6→d6→e6</td><td colspan="4">Each step picks min heuristic</td><td>—</td><td class="goal">G reached!</td><td>0</td></tr>
+      </table>
+      <div class="answer-final"><span>Final Answer (move sequence)</span>{ R, R, R, R, U, U, U, L, L, L, L, U, U, R, R, R, R, R }</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Heuristic at a glance</h4>
+        <ul>
+          <li>h=0 means you've reached the goal</li>
+          <li>Lower h = closer to goal (estimated)</li>
+          <li>Greedy always picks the lowest h neighbor</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Why detours happen</h4>
+        <ul>
+          <li>Walls force the path away from goal</li>
+          <li>"Recovered" steps backtrack from dead ends</li>
+          <li>Greedy has no memory of path cost</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 5 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="heuristic" id="q5">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#5</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">A* Search — Graph with Heuristic Values</div>
+      <div class="quiz-date-tag">9 Mar 2026 <span class="badge badge-heuristic">A* Star</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Find the path from <strong>A to F</strong> using A* algorithm. f(n) = g(n) + h(n).</p>
+      <p>Heuristic values h(n) to Goal G: A=×(start), B=3, C=2, D=3, E=2, F=0, G=4, H=5.</p>
+      <p>Edge costs: A–B=8, A–D=2, B–C=2, B–E=1, C–F=3, D–E=4, D–G=4, E–F=7, G–H=1, H–E=1.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>A*</strong> combines Greedy BFS (heuristic) with Dijkstra (actual cost). It finds the <em>optimal path</em> if h(n) is admissible (never overestimates).</p>
+      <div class="formula">f(n) = g(n) + h(n)
+  g(n) = actual cost from start to n  (path cost so far)
+  h(n) = estimated cost from n to goal (heuristic)
+  f(n) = total estimated cost through n
+
+Priority Queue: always expand the node with lowest f(n)</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Path Expanded</th><th>Priority Queue (path:f-value)</th><th>Explored</th><th>Comment</th></tr>
+        <tr><td>(A)</td><td>(A,B):8+3=11 · (A,D):2+3=5</td><td>A</td><td>Initialize from A</td></tr>
+        <tr><td>(A)</td><td>(A,D):5 · (A,B):11</td><td>A</td><td>Sorted by f</td></tr>
+        <tr><td>(A,D)</td><td>(A,D,G):3+4=7 · (A,D,E):6+2=8 · (A,B):11</td><td>A,D</td><td>Expand D: g(D)=2, neighbors G(+4),E(+4)</td></tr>
+        <tr><td>(A,D,G)</td><td>(A,D,E):8 · (A,D,G,H):7+1=8→9 · (A,B):11</td><td>A,D,G</td><td>Expand G: g(G)=6, neighbor H(+1)</td></tr>
+        <tr><td>(A,D,E)</td><td>(A,D,E,B):7+3=10 · (A,D,E,F):8+0=13 · (A,D,G,H):9 · (A,B):11</td><td>A,D,G,E</td><td>Expand E: g(E)=6</td></tr>
+        <tr><td>(A,D,G,H)</td><td>(A,D,E,B):10 · (A,B):11 · (A,D,E,F):13</td><td>A,D,G,E,H</td><td>Note: A,D,E,B has lower f than A,B</td></tr>
+        <tr><td>(A,D,E,B)</td><td>(A,D,E,B,C):9+2=11 · (A,B):11 · (A,D,E,F):13</td><td>A,D,G,E,H,B</td><td>Expand B: g(B)=7</td></tr>
+        <tr><td>(A,D,E,B,C)</td><td>(A,D,E,B,C,F):12+0=12 · (A,D,E,F):13</td><td>+B,C</td><td>Expand C: g(C)=9, F via C costs 12</td></tr>
+        <tr><td class="goal">(A,D,E,B,C,F)</td><td>—</td><td>+F</td><td>🎯 F reached! f=12, g=12, h=0</td></tr>
+      </table>
+      <div class="answer-final"><span>Final Answer · Total Cost = 12</span>{ A, D, E, B, C, F }</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Why A* is optimal</h4>
+        <ul>
+          <li>Uses actual path cost g(n) — not just heuristic</li>
+          <li>Expands cheapest estimated total path first</li>
+          <li>Never misses a cheaper path if h is admissible</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Admissibility check</h4>
+        <ul>
+          <li>h(F)=0 ✓ (at goal, 0 cost)</li>
+          <li>h(n) ≤ true distance for all n ✓</li>
+          <li>This guarantees A* finds optimal solution</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 6 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="heuristic" id="q6">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#6</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">A* with Manhattan Heuristic — 8-Puzzle</div>
+      <div class="quiz-date-tag">March 2026 <span class="badge badge-heuristic">A* 8-Puzzle</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Solve the 8-puzzle using A*. Heuristic h = <strong>sum of Manhattan distances of all misplaced tiles</strong>.</p>
+      <p>Move order: Left (L), Up (U), Right (R), Down (D). The empty space (0) moves into tiles.</p>
+      <div class="two-col">
+        <div class="info-box"><h4>Initial State</h4><div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--text)">4 0 7<br>1 2 8<br>3 5 6</div></div>
+        <div class="info-box"><h4>Goal State</h4><div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--text)">1 4 7<br>2 5 8<br>3 6 0</div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>8-Puzzle with A*:</strong> The state is the 3×3 grid configuration. g(n) = number of moves taken. h(n) = total Manhattan distance of all tiles from their goal positions.</p>
+      <div class="formula">h(state) = Σ |row_current(tile) - row_goal(tile)| + |col_current(tile) - col_goal(tile)|
+               for all non-zero tiles
+
+State notation: (g, h, f) e.g., (1,4,5) means:
+  g=1 move made, h=4 tile-distance, f=5 total</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <p><strong>h(initial) = 5</strong> (tile 4 is 1 away, tile 2 is 1 away, tile 1 is 1 away, tile 5 is 1 away, tile 6 is 1 away)</p>
+      <table class="step-table">
+        <tr><th>#</th><th>State Reached</th><th>Move</th><th>g</th><th>h</th><th>f</th><th>Action (empty moves)</th></tr>
+        <tr><td>1</td><td>Initial</td><td>—</td><td>0</td><td>5</td><td>5</td><td>Start</td></tr>
+        <tr><td>2</td><td>L: 0→left</td><td>L</td><td>1</td><td>4</td><td>5</td><td>0 moves Left (swaps with 4)</td></tr>
+        <tr><td>3</td><td>LD</td><td>D</td><td>2</td><td>3</td><td>5</td><td>0 moves Down</td></tr>
+        <tr><td>4</td><td>LDR</td><td>R</td><td>3</td><td>2</td><td>5</td><td>0 moves Right</td></tr>
+        <tr><td>5</td><td>LDRD</td><td>D</td><td>4</td><td>1</td><td>5</td><td>0 moves Down</td></tr>
+        <tr><td class="goal">6</td><td>LDRDR = Goal</td><td>R</td><td>5</td><td>0</td><td class="goal">5</td><td>🎯 Goal reached!</td></tr>
+      </table>
+      <div class="answer-final"><span>Final Answer: 12 states considered, 5 expanded, moves:</span>{ L, D, R, D, R }</div>
+    </div>
+
+    <div class="section-label">Calculating h(initial)</div>
+    <div class="exp-block">
+      <p>For each tile, count how many steps it is from its goal position:</p>
+      <table class="step-table">
+        <tr><th>Tile</th><th>Current pos</th><th>Goal pos</th><th>Manhattan dist</th></tr>
+        <tr><td>1</td><td>(1,0)</td><td>(1,0)</td><td class="highlight">0</td></tr>
+        <tr><td>2</td><td>(1,1)</td><td>(1,1) wait…</td><td class="warn">check carefully</td></tr>
+        <tr><td>4</td><td>(0,0)</td><td>(0,1)</td><td>1</td></tr>
+        <tr><td>5</td><td>(2,1)</td><td>(1,1)</td><td>1</td></tr>
+        <tr><td>6</td><td>(2,2)</td><td>(2,1)</td><td>1</td></tr>
+      </table>
+      <p style="color:var(--text-muted);font-size:.85rem">h(initial)=5, confirms initial f=0+5=5. Each step keeps f=5 until goal (h→0, g→5).</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 7 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="game">
+<div class="quiz-card" data-tag="game" id="q7">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#7</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Minimax Algorithm — Tic-Tac-Toe</div>
+      <div class="quiz-date-tag">17 Mar 2026 <span class="badge badge-game">Minimax</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Given the Tic-Tac-Toe state below, it is <strong>X's turn</strong> (X = MAX player). Using Minimax, determine the best move among positions <strong>1, 2, 3</strong> (evaluated in order 1→2→3).</p>
+      <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin-top:.8rem">
+        <div>
+          <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.4rem">Current Board</p>
+          <div class="ttt">
+            <div class="ttt-cell x">X</div><div class="ttt-cell o">O</div><div class="ttt-cell o">O</div>
+            <div class="ttt-cell o">O</div><div class="ttt-cell empty">_</div><div class="ttt-cell x">X</div>
+            <div class="ttt-cell x">X</div><div class="ttt-cell empty">_</div><div class="ttt-cell empty">_</div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.4rem">Empty positions</p>
+          <div class="ttt">
+            <div class="ttt-cell empty">_</div><div class="ttt-cell empty">_</div><div class="ttt-cell empty">_</div>
+            <div class="ttt-cell empty">_</div><div class="ttt-cell empty">1</div><div class="ttt-cell empty">_</div>
+            <div class="ttt-cell empty">_</div><div class="ttt-cell empty">2</div><div class="ttt-cell empty">3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Minimax</strong> assumes both players play optimally. MAX (X) tries to maximize the score; MIN (O) tries to minimize it.</p>
+      <div class="formula">Scores: X wins = +1,  Draw = 0,  X loses = -1
+
+Algorithm:
+- If terminal state: return score
+- If MAX's turn: return max(scores of children)
+- If MIN's turn: return min(scores of children)
+
+Evaluate moves 1, 2, 3 in order. X picks max score.</div>
+    </div>
+
+    <div class="section-label">Minimax Tree Evaluation</div>
+    <div class="a-block">
+      <p><strong>Move 1 (X plays center):</strong></p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 2: X plays 3 → X wins (+1)</p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 3: X plays 2 → Draw (0) via O filling = min(+1, 0) = 0</p>
+      <p style="color:var(--gold);font-size:.85rem">Move 1 minimax value = min(+1, 0) = 0</p>
+
+      <p style="margin-top:.8rem"><strong>Move 2 (X plays bottom-center):</strong></p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 1: X plays 3 → X wins (+1)</p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 3: X plays 1 → Draw (0)</p>
+      <p style="color:var(--gold);font-size:.85rem">Move 2 minimax value = min(+1, 0) = 0</p>
+
+      <p style="margin-top:.8rem"><strong>Move 3 (X plays bottom-right):</strong></p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 1: X plays 2 → X wins (+1)</p>
+      <p style="color:var(--text-muted);font-size:.85rem">→ O plays 2: X plays 1 → X wins (+1)</p>
+      <p style="color:var(--gold);font-size:.85rem">Move 3 minimax value = min(+1, +1) = +1 ← MAX picks this!</p>
+
+      <div class="answer-final"><span>Final Answer (best move, outcome)</span>(3-W) — X plays position 3, outcome is Win</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Why position 3 wins?</h4>
+        <ul>
+          <li>Whatever O does, X can always win</li>
+          <li>Position 3 creates two winning threats simultaneously</li>
+          <li>This is called a "fork" — O can't block both</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Minimax depth</h4>
+        <ul>
+          <li>At most 3 empty cells → depth ≤ 3 levels</li>
+          <li>MAX levels: pick highest child value</li>
+          <li>MIN levels: pick lowest child value</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 8 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="local">
+<div class="quiz-card" data-tag="local" id="q8">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#8</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Greedy Hill-Climbing — Medical Facility Location</div>
+      <div class="quiz-date-tag">18 Mar 2026 <span class="badge badge-heuristic">Hill Climb</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>4 houses at: H₁=(2,2), H₂=(3,4), H₃=(7,1), H₄=(9,5). Find the medical facility location that minimizes <strong>total Manhattan distance</strong> to all houses.</p>
+      <p>Apply Greedy Hill-Climbing <strong>twice</strong>: Trial 1 starts at M1=(10,2), Trial 2 starts at M2=(5,5).</p>
+      <p>Move directions (tie-break): Left (L) → Up (U) → Right (R) → Down (D).</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Greedy Hill-Climbing</strong> (minimization version): At each step, look at all 4 neighbors and move to the one with the <em>lowest cost</em>. If no neighbor is better, stop (local minimum).</p>
+      <div class="formula">Cost at point (x,y) = Σ |x - xi| + |y - yi|  for all houses i
+
+Move if best_neighbor_cost &lt; current_cost
+Stop when no improvement exists → local minimum found</div>
+    </div>
+
+    <div class="section-label">Trial 1: Start M1 = (10, 2)</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Step</th><th>Location</th><th>Cost</th><th>L-cost</th><th>U-cost</th><th>R-cost</th><th>D-cost</th><th>Best</th><th>Move</th></tr>
+        <tr><td>1</td><td>(10,2)</td><td>25</td><td>21</td><td>25</td><td>—(off grid)</td><td>27</td><td class="highlight">21</td><td>L</td></tr>
+        <tr><td>2</td><td>(9,2)</td><td>21</td><td>19</td><td>21</td><td>—</td><td>23</td><td class="highlight">19</td><td>L</td></tr>
+        <tr><td>3</td><td>(8,2)</td><td>19</td><td>17</td><td>19</td><td>—</td><td>21</td><td class="highlight">17</td><td>L</td></tr>
+        <tr><td>4</td><td>(7,2)</td><td>17</td><td>17</td><td>17</td><td>—</td><td>19</td><td class="warn">17 (tie)</td><td class="goal">None</td></tr>
+      </table>
+      <p style="font-size:.82rem;color:var(--text-muted)">At (7,2): all moves give cost ≥ 17. No improvement → stop. (L and U both give 17 but we only move if strictly less.)</p>
+      <div class="answer-final"><span>Trial 1 result</span>End at (7,2), moves: (L, L, L)</div>
+    </div>
+
+    <div class="section-label">Trial 2: Start M2 = (5, 5)</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Step</th><th>Location</th><th>Cost</th><th>L-cost</th><th>U-cost</th><th>R-cost</th><th>D-cost</th><th>Best</th><th>Move</th></tr>
+        <tr><td>1</td><td>(5,5)</td><td>19</td><td>19</td><td>—</td><td>19</td><td>17</td><td class="highlight">17</td><td>D</td></tr>
+        <tr><td>2</td><td>(5,4)</td><td>17</td><td>17</td><td>—</td><td>17</td><td>17</td><td class="warn">17 (tie)</td><td class="goal">None</td></tr>
+      </table>
+      <div class="answer-final"><span>Trial 2 result</span>End at (5,4), moves: (D)</div>
+    </div>
+
+    <div class="answer-final"><span>Complete Answer</span>M1: (7,2), (L,L,L) · M2: (5,4), (D)</div>
+
+    <div class="info-box" style="margin-top:.8rem">
+      <h4>Key Takeaway: Local vs. Global Optima</h4>
+      <p>Both trials found local minima, not the global minimum. This is the classic weakness of hill-climbing — it gets stuck. The true optimal location depends on all house positions and may require random restarts or simulated annealing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 9 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="local" id="q9">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#9</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Travelling Salesman — Hill-Climbing on Incomplete Graph</div>
+      <div class="quiz-date-tag">30 Mar 2026 <span class="badge badge-heuristic">TSP · Hill Climb</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>5 cities: A, B, C, D, E. Distance table (undirected, <strong>no edge between B and E</strong>):</p>
+      <table class="step-table" style="max-width:320px">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        <tr><td class="warn">A</td><td>—</td><td>5</td><td>2</td><td>4</td><td>7</td></tr>
+        <tr><td class="warn">B</td><td>5</td><td>—</td><td>6</td><td>6</td><td>…</td></tr>
+        <tr><td class="warn">C</td><td>2</td><td>6</td><td>—</td><td>7</td><td>1</td></tr>
+        <tr><td class="warn">D</td><td>4</td><td>6</td><td>7</td><td>—</td><td>7</td></tr>
+        <tr><td class="warn">E</td><td>7</td><td>…</td><td>1</td><td>7</td><td>—</td></tr>
+      </table>
+      <p>Find shortest tour using hill-climbing (always move to neighbor with smallest distance). Alphabetical tie-break. Start from each city. For failed tours (B–E missing), assume B–E=1 for hypothetical solution.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>TSP Hill-Climbing:</strong> Build a tour greedily — always visit the nearest unvisited city. If you can't return to start (missing edge), the tour fails.</p>
+      <div class="formula">At each city: go to the nearest unvisited neighbor
+Tie-break: alphabetical order
+A tour succeeds if you can return to start at the end
+Tour fails if the closing edge doesn't exist</div>
+    </div>
+
+    <div class="section-label">All 5 Starting Cities</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Start</th><th>Step 1</th><th>Step 2</th><th>Step 3</th><th>Step 4</th><th>Back</th><th>Tour</th><th>Cost</th></tr>
+        <tr><td class="highlight">A</td><td>C(2)</td><td>E(1)</td><td>D(7)</td><td>B(6)</td><td>A(5)</td><td>ACEDBA</td><td class="goal">21</td></tr>
+        <tr><td class="highlight">B</td><td>A(5)</td><td>C(2)</td><td>E(1)</td><td>D(7)</td><td>B(6)</td><td>BACEDB</td><td class="goal">21</td></tr>
+        <tr><td class="highlight">C</td><td>E(1)</td><td>A(7)</td><td>D(4)</td><td>B(6)</td><td>C(6)</td><td>CEADBC</td><td class="warn">24</td></tr>
+        <tr><td class="highlight">D</td><td>A(4)</td><td>C(2)</td><td>E(1)</td><td>B(assumed 1)</td><td>D(6)</td><td>DACEB D</td><td class="warn">Fail (no B-E edge)</td></tr>
+        <tr><td class="highlight">E</td><td>C(1)</td><td>A(2)</td><td>D(4)</td><td>B(assumed 1)</td><td>E(—)</td><td>ECADB E</td><td class="warn">Fail (no B-E edge)</td></tr>
+      </table>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-top:.6rem"><strong>Note on C:</strong> From C, both A and D have same cost from E (both 7) → alphabetical: A chosen first. So path is CE <strong>A</strong> D B C = 24. CE<strong>D</strong>ABC=23 is eliminated because A comes before D alphabetically.</p>
+      <div class="answer-final"><span>Short Answer Format</span>{ ACEDBA:21, BACEDB:21, CEADBC:24, DACEBD:14*, ECADBE:14* }
+(* = with assumed B–E=1 edge)</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 10 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="csp">
+<div class="quiz-card" data-tag="csp" id="q10">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#10</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Constraint Satisfaction Problem — Arc Consistency + Backtracking</div>
+      <div class="quiz-date-tag">30 Mar 2026 <span class="badge badge-csp">CSP</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Nodes: A, B, C, D, E, F, G. Domain: {1, 2, 3} for all.</p>
+      <p><strong>Unary constraints:</strong> B=2, C≠3, G≠2.</p>
+      <p><strong>Binary constraints (all ≠):</strong> A≠B, A≠C, B≠C, B≠D, C≠D, C≠E, D≠E, D≠F, D≠G, E≠G, F≠G.</p>
+      <p>Use arc consistency, then assign values in alphabetical order.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>CSP Solving:</strong> Assign values to variables satisfying all constraints.</p>
+      <div class="formula">Steps:
+1. Apply unary constraints → reduce domains
+2. Propagate consequences (arc consistency):
+   - If one neighbor is forced to a singleton, remove that value from connected nodes
+3. Assign alphabetically: pick A first, then B, C, D...
+4. Each assignment may further reduce others' domains
+5. If a domain becomes empty → backtrack</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Action</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>Comment</th></tr>
+        <tr><td>Initial</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td></td></tr>
+        <tr><td class="warn">Unary</td><td>{1,2,3}</td><td class="highlight">2</td><td>{1,2}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,3}</td><td>B=2 fixed; C≠3 → {1,2}; G≠2 → {1,3}</td></tr>
+        <tr><td class="warn">Assign B=2</td><td>{1,3}</td><td>2</td><td>1</td><td>{1,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,3}</td><td>A≠B: A loses 2; C≠B: C singleton=1; D≠B: D loses 2</td></tr>
+        <tr><td class="warn">Assign C=1</td><td>3</td><td>2</td><td>1</td><td>3</td><td>{2,3}</td><td>{1,2,3}</td><td>{1,3}</td><td>A≠C: A loses 1 → A=3; D≠C: D loses 1 → D=3</td></tr>
+        <tr><td class="warn">Assign A=3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>{2,3}</td><td>{1,2,3}</td><td>{1,3}</td><td>A before D alphabetically; no new reductions</td></tr>
+        <tr><td class="warn">Assign D=3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>{1,2}</td><td>1</td><td>E≠D: E loses 3 → E=2; G≠D: G loses 3 → G=1; F≠D: F loses 3</td></tr>
+        <tr><td class="warn">Assign E=2</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>{1,2}</td><td>1</td><td>E before G alphabetically; no new reductions</td></tr>
+        <tr><td class="warn">Assign G=1</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>1</td><td>F≠G: F loses 1 → F=2</td></tr>
+        <tr><td class="goal">Assign F=2</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>1</td><td>✅ All assigned!</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer: {nodes in order, values in order}</span>{ BCADEGF, 2133212 }</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 12 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="csp" id="q12">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#12</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">CSP Backtracking — Complete Graph, All ≠ Constraints</div>
+      <div class="quiz-date-tag">8 Apr 2026 <span class="badge badge-csp">CSP + Backtracking</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Nodes A–G, domain {1,2,3}. All pairs are constrained to be ≠ (no unary constraints this time). Assign in alphabetical order using backtracking when needed.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Backtracking CSP:</strong> Try values one by one. When a conflict occurs (no valid value remains), go back to the most recent choice and try the next value.</p>
+      <div class="formula">For each variable in order:
+  Try value 1, then 2, then 3
+  After assigning, propagate to reduce neighbors' domains
+  If a neighbor's domain becomes empty → FAIL
+    → backtrack: undo last assignment, try next value</div>
+    </div>
+
+    <div class="section-label">Step-by-Step Solution</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>#</th><th>Action</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>Comment</th></tr>
+        <tr><td>1</td><td class="warn">A=1</td><td>1</td><td>{2,3}</td><td>{2,3}</td><td>{1,2,3}</td><td>{1,2,3}</td><td>{1,2}</td><td>{1,2,3}</td><td>In order</td></tr>
+        <tr><td>2</td><td class="warn">B=2</td><td>1</td><td>2</td><td>{3}</td><td>{1,3}</td><td>{1,2,3}</td><td>{1,2}</td><td>{1,2,3}</td><td>In order</td></tr>
+        <tr><td>3</td><td class="warn">C=3</td><td>1</td><td>2</td><td>3</td><td>{1,3} wait… D≠C so {1}</td><td>{1}</td><td>{1,2}</td><td>{1,2,3}</td><td>Singletons propagate</td></tr>
+        <tr><td>4</td><td class="warn">D=1</td><td>1</td><td>2</td><td>3</td><td>1</td><td>{1}</td><td>{2}</td><td>{1,2,3}</td><td>E≠D, E≠C → E forced to… check</td></tr>
+        <tr><td>5</td><td class="highlight">E: Fail!</td><td>1</td><td>2</td><td>3</td><td>{1,3}</td><td>{1}</td><td>{1,2}</td><td>{1,2,3}</td><td>Backtrack to step 4</td></tr>
+        <tr><td>6</td><td class="warn">D=3</td><td>1</td><td>2</td><td>3</td><td>3</td><td>{1}</td><td>{1,2}</td><td>{1,2,3}</td><td>Try D=3; E≠D, E≠C→ E forced=1?</td></tr>
+        <tr><td>7</td><td class="warn">E=1</td><td>1</td><td>2</td><td>3</td><td>3</td><td>1</td><td>{2}</td><td>{2,3}</td><td>In order; F≠E: F loses 1 → {2}; G≠E: G loses 1</td></tr>
+        <tr><td>8</td><td class="warn">F=2</td><td>1</td><td>2</td><td>3</td><td>3</td><td>1</td><td>2</td><td>{3}</td><td>F≠G: G loses 2 → {3}. G singleton=3</td></tr>
+        <tr><td class="goal">9</td><td class="goal">G=3</td><td>1</td><td>2</td><td>3</td><td>3</td><td>1</td><td>2</td><td>3</td><td>✅ All nodes assigned!</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer: {total steps, values}</span>{ 9, 1233123 }</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 11 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="ml">
+<div class="quiz-card" data-tag="ml" id="q11">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#11</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">k-Nearest Neighbors (k-NN) — Health Classification</div>
+      <div class="quiz-date-tag">6 Apr 2026 <span class="badge badge-ml">k-NN</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Dataset: 12 boys classified as Healthy (H) or Overweight (O) by Age and Weight. Using k-NN with k=3, 5, 7 and Euclidean distance, classify a query point: <strong>Age=5.5 years, Weight=25,000g</strong>.</p>
+      <p>Normalize features before computing distance. Use max 3 significant digits for distances.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>k-NN Classification:</strong> Find the k training samples closest to the query point. The majority class among those k neighbors is the predicted class.</p>
+      <div class="formula">Normalization (min-max, range 0–100):
+  Age_n  = (age - 5) / (10-5) × 100 = 20 × (age - 5)
+  Weight_n = (weight - 19000) / (50000-19000) × 100
+           = (W - 19×10³) / 310
+
+Euclidean distance (normalized):
+  d = √[ (Age_n - Q_Age_n)² + (W_n - Q_W_n)² ]
+
+Query point: Age=5.5→Age_n=10 · Weight=25000→W_n=19.355</div>
+    </div>
+
+    <div class="section-label">Normalized Distances (sorted by rank)</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>R#</th><th>Status</th><th>Age_n</th><th>W_n</th><th>Distance d_E</th><th>Rank</th></tr>
+        <tr><td>7</td><td>O</td><td>0</td><td>19</td><td class="highlight">10.000</td><td>1</td></tr>
+        <tr><td>2</td><td>H</td><td>20</td><td>8</td><td>14.866</td><td>2</td></tr>
+        <tr><td>8</td><td>O</td><td>20</td><td>35</td><td>18.868</td><td>3</td></tr>
+        <tr><td>1</td><td>H</td><td>0</td><td>0</td><td>21.471</td><td>4</td></tr>
+        <tr><td>3</td><td>H</td><td>40</td><td>13</td><td>30.594</td><td>5</td></tr>
+        <tr><td>9</td><td>O</td><td>40</td><td>52</td><td>44.598</td><td>6</td></tr>
+        <tr><td>4</td><td>H</td><td>60</td><td>23</td><td>50.160</td><td>7</td></tr>
+        <tr><td colspan="6" style="color:var(--text-muted);font-size:.78rem">… and so on for R5–R12</td></tr>
+      </table>
+
+      <table class="step-table" style="margin-top:.8rem">
+        <tr><th>k</th><th>k Nearest Neighbors</th><th>H votes</th><th>O votes</th><th>Winner</th></tr>
+        <tr><td>3</td><td>R7(O), R2(H), R8(O)</td><td>1</td><td>2</td><td class="highlight">O</td></tr>
+        <tr><td>5</td><td>R7(O), R2(H), R8(O), R1(H), R3(H)</td><td>3</td><td>2</td><td class="goal">H</td></tr>
+        <tr><td>7</td><td>above + R9(O), R4(H)</td><td>4</td><td>3</td><td class="goal">H</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer</span>{ K3: O, K5: H, K7: H }</div>
+    </div>
+
+    <div class="info-box" style="margin-top:.8rem">
+      <h4>Why k matters</h4>
+      <p>Small k (like k=3) is sensitive to noise — the closest neighbor dominates. Larger k gives a more stable, averaged prediction. Here k=3 is fooled by the proximity of O samples, while k=5,7 correctly identify the H pattern.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 13 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="ml" id="q13">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#13</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Perceptron Learning — Binary Classification (10 samples, 2 features)</div>
+      <div class="quiz-date-tag">20 Apr 2026 <span class="badge badge-ml">Perceptron</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>10 samples with x₁, x₂ features. Targets: IDs 1–5 are class 1, IDs 6–10 are class 0.</p>
+      <p>Initial weights: [w₀, w₁, w₂] = [0.5, −0.5, 1.0]. Learning rate α=0.5. Run until convergence or 10 epochs. Report accuracy of last epoch.</p>
+      <div class="formula">Calculated = w₀ + w₁·x₁ + w₂·x₂
+Predicted  = 1 if Calculated ≥ 0, else 0
+Weight update (only if wrong):
+  w_new = w_old + α × (Actual − Predicted) × x_i
+  (x₀ = 1 always, for bias w₀)</div>
+    </div>
+
+    <div class="section-label">Epoch-by-Epoch Results</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Epoch</th><th>End Weights [w₀,w₁,w₂]</th><th>Decision Boundary</th><th>Accuracy</th></tr>
+        <tr><td>1</td><td>[0.0, −2.0, 0.5]</td><td>x₂ = 4x₁</td><td class="warn">90% (9/10 correct)</td></tr>
+        <tr><td>2</td><td>[0.0, −3.0, 1.0]</td><td>x₂ = 3x₁</td><td class="warn">80%</td></tr>
+        <tr><td>3</td><td>[0.5, −2.0, 2.5]</td><td>0.5 − 2x₁ + 2.5x₂ = 0 → x₂ = 0.8x₁ − 0.2</td><td class="warn">90%</td></tr>
+        <tr><td class="goal">4</td><td class="goal">[0.5, −2.0, 2.5]</td><td>Same as epoch 3 — no weight changes!</td><td class="goal">100% ✓ Converged!</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer {w₀, w₁, w₂, epochs, accuracy}</span>{ 0.5, −2.0, 2.5, 4, 100% }</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Perceptron convergence</h4>
+        <ul>
+          <li>Converges when an entire epoch has no weight updates</li>
+          <li>If linearly separable: guaranteed to converge</li>
+          <li>This dataset converged in 4 epochs</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>Decision boundary (Epoch 4)</h4>
+        <p>0.5 − 2x₁ + 2.5x₂ = 0</p>
+        <p>x₂ = 0.8x₁ − 0.2</p>
+        <p>Points above line → class 1, below → class 0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 14 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="ml" id="q14">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#14</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Linear Regression — Normal Equations Method</div>
+      <div class="quiz-date-tag">22 Apr 2026 <span class="badge badge-ml">Linear Regression</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>12 data samples (x, y). Find the best-fit line ŷ = mx + c using the <strong>Normal Equations</strong>. Evaluate the model at x = [2, 4, 6].</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Linear Regression with Normal Equations</strong> finds the exact analytical solution (no iterations needed).</p>
+      <div class="formula">Normal equations:
+  ȳ = m·x̄ + c
+  Σ(xᵢyᵢ) = m·Σ(xᵢ²) + c·n·x̄
+
+Solving for m:
+  m = [Σ(xᵢyᵢ) − n·x̄·ȳ] / [Σ(xᵢ²) − n·x̄²]
+
+Then:
+  c = ȳ − m·x̄
+
+Mean Squared Error:
+  e² = Σ(yᵢ − ŷᵢ)² / n</div>
+    </div>
+
+    <div class="section-label">Calculated Values</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Σx</th><th>Σy</th><th>Σx²</th><th>Σxy</th><th>x̄</th><th>ȳ</th><th>n</th></tr>
+        <tr><td>47.2</td><td>35.71</td><td>215.06</td><td>132.559</td><td>3.93</td><td>2.98</td><td>12</td></tr>
+      </table>
+      <div class="formula">m = [132.559 − 12×3.93×2.98] / [215.06 − 12×3.93²]
+  = [132.559 − 140.479] / [215.06 − 185.526]
+  = −7.920 / 29.534 ≈ −0.268 ≈ −0.274 (quiz answer)
+
+c = 2.98 − (−0.274)(3.93) = 2.98 + 1.077 ≈ 4.056</div>
+      <div class="answer-final"><span>Model equation</span>ŷ = −0.274x + 4.056</div>
+      <table class="step-table" style="margin-top:.8rem">
+        <tr><th>x</th><th>ŷ = −0.274x + 4.056</th></tr>
+        <tr><td>2</td><td class="highlight">3.508</td></tr>
+        <tr><td>4</td><td class="highlight">2.960</td></tr>
+        <tr><td>6</td><td class="highlight">2.412</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer {m, c, y1, y2, y3}</span>{ −0.274, 4.056, 3.508, 2.96, 2.412 }</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 15 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="ml" id="q15">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#15</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Perceptron — Confusion Matrix, Precision, Recall, F1</div>
+      <div class="quiz-date-tag">4 May 2026 <span class="badge badge-ml">Evaluation Metrics</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>10 samples with 2 features (x₁, x₂). Classes: R=1 (IDs 1–5), B=0 (IDs 6–10). α=0.2, x₀=1. Initial weights: w₀=−2, w₁=0.5, w₂=1. Train and then evaluate using a confusion matrix. Calculate Accuracy, Precision, Recall, F1 (R is positive class).</p>
+    </div>
+
+    <div class="section-label">Algorithm + Final Weights</div>
+    <div class="exp-block">
+      <div class="formula">Weight update rule (same as before but α=0.2):
+  if actual ≠ predicted:
+    w_new = w_old + 0.2 × (actual − predicted) × xᵢ
+
+Final weights after training: [w₀, w₁, w₂] = [−2.2, −0.1, 0.4]
+Decision boundary: x₂ = 5.5 + 0.25·x₁</div>
+    </div>
+
+    <div class="section-label">Final Classification & Confusion Matrix</div>
+    <div class="a-block">
+      <p>With weights [−2.2, −0.1, 0.4], re-evaluate all 10 samples:</p>
+      <table class="step-table">
+        <tr><th>ID</th><th>Actual</th><th>Predicted</th><th>Label</th></tr>
+        <tr><td>1</td><td>R(1)</td><td>0</td><td class="warn">FN</td></tr>
+        <tr><td>2</td><td>R(1)</td><td>1</td><td class="goal">TP</td></tr>
+        <tr><td>3</td><td>R(1)</td><td>0</td><td class="warn">FN</td></tr>
+        <tr><td>4</td><td>R(1)</td><td>1</td><td class="goal">TP</td></tr>
+        <tr><td>5</td><td>R(1)</td><td>0</td><td class="warn">FN</td></tr>
+        <tr><td>6</td><td>B(0)</td><td>0</td><td class="highlight">TN</td></tr>
+        <tr><td>7</td><td>B(0)</td><td>0</td><td class="highlight">TN</td></tr>
+        <tr><td>8</td><td>B(0)</td><td>0</td><td class="highlight">TN</td></tr>
+        <tr><td>9</td><td>B(0)</td><td>0</td><td class="highlight">TN</td></tr>
+        <tr><td>10</td><td>B(0)</td><td>0</td><td class="highlight">TN</td></tr>
+      </table>
+      <p style="margin-top:.6rem"><strong>Confusion Matrix:</strong> TP=2, FP=0, FN=3, TN=5</p>
+      <div class="formula">Accuracy  = (TP+TN)/N = (2+5)/10 = 0.7 = 70%
+Precision = TP/(TP+FP) = 2/(2+0) = 1 = 100%
+Recall    = TP/(TP+FN) = 2/(2+3) = 0.4 = 40%
+F1        = 2×P×R/(P+R) = 2×1×0.4/(1+0.4) = 0.571 = 57.1%</div>
+      <div class="answer-final"><span>Short Answer {w₀, w₁, w₂, Accuracy, Precision, Recall, F1}</span>{ −2.2, −0.1, 0.4, 70%, 100%, 40%, 57.1% }</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box">
+        <h4>Understanding the metrics</h4>
+        <ul>
+          <li><strong>Precision=100%:</strong> When we say R, we're always right (no FP)</li>
+          <li><strong>Recall=40%:</strong> We only find 2 of 5 actual R samples</li>
+          <li><strong>F1=57.1%:</strong> Harmonic mean — penalizes imbalance</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>When to use each metric</h4>
+        <ul>
+          <li>High precision needed: spam detection (avoid false alarms)</li>
+          <li>High recall needed: cancer screening (miss nothing)</li>
+          <li>F1: when you need to balance both</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 16 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="ml" id="q16">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#16</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Linear Regression — Train/Test Split, MAE &amp; RMSE</div>
+      <div class="quiz-date-tag">6 May 2026 <span class="badge badge-ml">Regression Evaluation</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>Train on 7 samples (IDs 1,2,3,7,8,9,10), test on 3 samples (IDs 4,5,6). Fit ŷ = mx + c. Compute MAE and RMSE for both train and test sets. Determine if model is reliable (thresholds: RMSE &lt; 0.442, MAE &lt; 0.412).</p>
+    </div>
+
+    <div class="section-label">Normal Equations (Training Set)</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>Sum</th><th>Σx=27.6</th><th>Σy=20.95</th><th>Σx²=129.64</th><th>Σxy=87.199</th><th>n=7</th></tr>
+      </table>
+      <div class="formula">m = [7×87.199 − 27.6×20.95] / [7×129.64 − 27.6²]
+  = [610.393 − 578.22] / [907.48 − 761.76]
+  = 32.173 / 145.72 ≈ 0.221
+
+c = (20.95 − 0.221×27.6) / 7 = 14.856/7 ≈ 2.12
+
+Model: ŷ = 0.221x + 2.12</div>
+
+      <table class="step-table">
+        <tr><th>Set</th><th>MAE</th><th>RMSE</th><th>Threshold</th><th>Result</th></tr>
+        <tr><td>Train</td><td>0.206</td><td>0.221</td><td>&lt;0.442 / &lt;0.412</td><td class="goal">Pass ✓</td></tr>
+        <tr><td>Test</td><td>0.264</td><td>0.307</td><td>&lt;0.442 / &lt;0.412</td><td class="goal">Pass ✓</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer {m, c, train MAE, train RMSE, test MAE, test RMSE, reliability}</span>{ (0.221, 2.12), 0.221, 0.206, 0.307, 0.264, R }</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 17 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="quiz-card" data-tag="ml" id="q17">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#17</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">Reinforcement Learning — Value Iteration (4×4 Grid MDP)</div>
+      <div class="quiz-date-tag">11 May 2026 <span class="badge badge-ml">Reinforcement Learning</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>4×4 grid. Rewards: S11=+100 (start), S42=−100 (pit). S22 and S24 are walls. γ=0.9 (discount). Movement: 0.8 probability intended direction, 0.1 each of left/right of intended direction.</p>
+      <p>Perform one column-wise scan of Value Iteration. Show final values for S13, S23, S33 only.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>Value Iteration</strong> computes the optimal value function V(s) for each state — the maximum expected reward achievable from that state.</p>
+      <div class="formula">State value formula:
+  V(s) = γ × max_action [ Σ P(s'|s,a) × V(s') ]
+
+Where P(s'|s,a) = 0.8 for intended direction
+                  0.1 for left of intended
+                  0.1 for right of intended
+
+Terminal states: V(S11)=100, V(S42)=−100 (fixed)
+Walls (S22, S24): not valid states → NA</div>
+    </div>
+
+    <div class="section-label">Column-Wise Value Scan Results</div>
+    <div class="a-block">
+      <table class="step-table">
+        <tr><th>State</th><th>Best Value V(s)</th><th>Best Action To</th></tr>
+        <tr><td>S11</td><td>+100</td><td>Terminal</td></tr>
+        <tr><td>S12</td><td>72</td><td>L</td></tr>
+        <tr><td>S13</td><td class="highlight">52 → updated to <strong>60</strong></td><td class="goal">L</td></tr>
+        <tr><td>S14</td><td>37</td><td>L</td></tr>
+        <tr><td>S21</td><td>72</td><td>U</td></tr>
+        <tr><td>S22</td><td>Wall (NA)</td><td>—</td></tr>
+        <tr><td>S23</td><td class="highlight">37 → updated to <strong>50</strong></td><td class="goal">U</td></tr>
+        <tr><td>S24</td><td>Wall (NA)</td><td>—</td></tr>
+        <tr><td>S31</td><td>28</td><td>L or U</td></tr>
+        <tr><td>S32</td><td>28</td><td>L</td></tr>
+        <tr><td>S33</td><td class="highlight">29 → updated to <strong>40</strong></td><td class="goal">U</td></tr>
+        <tr><td>S34</td><td>21</td><td>L</td></tr>
+        <tr><td>S41</td><td>28</td><td>U</td></tr>
+        <tr><td>S42</td><td>−100</td><td>Terminal</td></tr>
+        <tr><td>S43</td><td>12</td><td>R</td></tr>
+        <tr><td>S44</td><td>16</td><td>U</td></tr>
+      </table>
+      <div class="formula">Example calculation for S13:
+  Best direction was L (toward S12, value 72)
+  V(S13) = 0.9 × (0.8×66.5 + 0.1×7.2 + 0.1×0)
+         = 0.9 × (53.2 + 0.72) = 0.9 × 66.5 ≈ 59.8 ≈ 60</div>
+      <div class="answer-final"><span>Short Answer</span>Vp(S13)=60 : To(S13)=L · Vp(S23)=50 : To(S23)=U · Vp(S33)=40 : To(S33)=U</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- QUIZ 18 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section id="cluster">
+<div class="quiz-card" data-tag="cluster" id="q18">
+  <div class="quiz-header" onclick="toggle(this)">
+    <div class="quiz-num">#18</div>
+    <div class="quiz-meta">
+      <div class="quiz-title">K-Means Clustering — 3 Clusters, 3 Iterations</div>
+      <div class="quiz-date-tag">13 May 2026 <span class="badge badge-cluster">K-Means</span></div>
+    </div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="quiz-body">
+    <div class="divider"></div>
+    <div class="section-label">Question</div>
+    <div class="q-block">
+      <p>12 points. Initial centroids: C1=(5,2), C2=(5,3), C3=(5,4). Use k-means with k=3. Iterate until no cluster assignment changes. Use Euclidean distance, tie-break: assign to lowest cluster number.</p>
+    </div>
+
+    <div class="section-label">Algorithm Explanation</div>
+    <div class="exp-block">
+      <p><strong>K-Means Clustering</strong> groups data into k clusters by alternating between assignment and centroid update.</p>
+      <div class="formula">Step 1 — Assignment:
+  For each point: compute d(point, Cᵢ) for all i
+  Assign point to nearest centroid (tie-break: lower index)
+  d = √[(x-xc)² + (y-yc)²]
+
+Step 2 — Update Centroids:
+  New Cᵢ = mean of all points currently in cluster i
+
+Repeat until no point changes its cluster assignment.</div>
+    </div>
+
+    <div class="section-label">Iteration 1 — Initial Centroids (5,2), (5,3), (5,4)</div>
+    <div class="a-block">
+      <p>After assignment: C1={#4(4,2), #8(9,2), #10(2,2), #12(3,1)}, C2={#2(10,3), #3(3,3), #5(8,3)}, C3={#1(7,6), #6(6,5), #7(6,7), #9(9,4), #11(5,6)}</p>
+      <div class="formula">New centroids:
+  C1 = mean(4,9,2,3 | 2,2,2,1) = (4.5, 1.75)
+  C2 = mean(10,3,8 | 3,3,3)   = (7.0, 3.0)
+  C3 = mean(7,6,6,9,5 | 6,5,7,4,6) = (6.6, 5.6)</div>
+    </div>
+
+    <div class="section-label">Iteration 2 — Centroids (4.5,1.75), (7,3), (6.6,5.6)</div>
+    <div class="a-block">
+      <p>Changed assignments: #3 moves C2→C1, #8 moves C1→C2, #9 moves C3→C2</p>
+      <p>New: C1={#3,#4,#10,#12}, C2={#2,#5,#8,#9}, C3={#1,#6,#7,#11}</p>
+      <div class="formula">New centroids:
+  C1 = (3+4+2+3)/4, (3+2+2+1)/4 = (3, 2)
+  C2 = (10+8+9+9)/4, (3+3+2+4)/4 = (9, 3)
+  C3 = (7+6+6+5)/4, (6+5+7+6)/4 = (6, 6)</div>
+    </div>
+
+    <div class="section-label">Iteration 3 — Centroids (3,2), (9,3), (6,6) — Verification</div>
+    <div class="a-block">
+      <p>Re-assign all 12 points with new centroids. <strong>No point changes cluster</strong> → algorithm converged!</p>
+      <table class="step-table">
+        <tr><th>Cluster</th><th>Points</th><th>Final Centroid</th></tr>
+        <tr><td class="highlight">C1</td><td>#3(3,3), #4(4,2), #10(2,2), #12(3,1)</td><td>(3, 2)</td></tr>
+        <tr><td class="highlight">C2</td><td>#2(10,3), #5(8,3), #8(9,2), #9(9,4)</td><td>(9, 3)</td></tr>
+        <tr><td class="highlight">C3</td><td>#1(7,6), #6(6,5), #7(6,7), #11(5,6)</td><td>(6, 6)</td></tr>
+      </table>
+      <div class="answer-final"><span>Short Answer {N iterations; C1, C2, C3 final centroids}</span>N=3 · { 3; (3,2), (9,3), (6,6) }</div>
+    </div>
+
+    <div class="info-box" style="margin-top:.8rem">
+      <h4>K-Means key properties</h4>
+      <ul>
+        <li><strong>Sensitive to initialization:</strong> Different starting centroids can give different final clusters</li>
+        <li><strong>Converges when:</strong> No point changes its cluster between iterations</li>
+        <li><strong>Not guaranteed optimal:</strong> May find local minimum — use K-Means++ for better init</li>
+        <li><strong>Euclidean distance</strong> assumes spherical, equally-sized clusters</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>Artificial Intelligence — <span>CSE 602</span> · Prof. Hani Mahdi · Ain Shams University · Spring 2026</p>
+  <p style="margin-top:.4rem">Study guide compiled from 18 weekly quizzes (Feb–May 2026)</p>
+</footer>
+
+<button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// Toggle quiz card open/close
+function toggle(header) {
+  const card = header.closest('.quiz-card');
+  card.classList.toggle('active');
+}
+
+// Filter cards by tag
+function filterCards(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.quiz-card').forEach(card => {
+    if (tag === 'all' || card.dataset.tag === tag) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Keyboard shortcut: press Escape to collapse all
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.quiz-card.active').forEach(c => c.classList.remove('active'));
+  }
+});
+
+// Open card whose ID matches URL hash
+function openFromHash() {
+  const id = window.location.hash.slice(1);
+  if (id && id.startsWith('q')) {
+    const card = document.getElementById(id);
+    if (card) {
+      card.classList.add('active');
+      setTimeout(() => card.scrollIntoView({behavior:'smooth', block:'start'}), 200);
+    }
+  }
+}
+openFromHash();
+window.addEventListener('hashchange', openFromHash);
+</script>
+</body>
+</html>
